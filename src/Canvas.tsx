@@ -7,6 +7,11 @@ const Canvas = () => {
     { id: "q0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
     { id: "q1", name: "q1", x: 180, y: 80, isSelected: false, isFinal: true },
   ]);
+  // curva bezier entre los dos estados basada en las funciones de transicion
+  // bezier curve between both states bases on transition functions (or however the hell they're called in english)
+  // no sera la forma mas optimizada para hacer esto pero es muy parecido a la teoria
+  //
+  const [curves, setCurves] = useState([{ id: "curve0", name: "curve0", start: "q0", end: "q1", symbol: ["0", "1"] }]);
 
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
