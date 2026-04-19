@@ -9,6 +9,7 @@ type StateProps = {
   isSelected: boolean;
   isFinal: boolean;
   onClick: (id: string) => void;
+  onDragStart: (id: string) => void;
 };
 
 const radius = 40;
@@ -18,11 +19,27 @@ const radius = 40;
 // TODO: Make a stylesheet to make switching from dark mode to light mode easier
 
 function State({ id, name, x, y, isSelected, isFinal, onClick }: StateProps) {
-  console.log(x, y);
-  //debug
-
   return (
-    <Group x={x} y={y} draggable onClick={() => onClick(id)}>
+    <Group
+      x={x}
+      y={y}
+      draggable
+      onClick={() => onClick(id)}
+      onDragStart={() => onClick(id)}
+    >
+      {isFinal && (
+        <Circle
+          radius={radius + 10}
+          strokeWidth={4}
+          stroke={isSelected ? "deeppink" : "black"}
+          fill="white"
+          shadowColor="deeppink"
+          shadowBlur={10}
+          shadowOffsetX={0}
+          shadowForStrokeEnabled={true}
+          shadowOpacity={isSelected ? 1 : 0}
+        />
+      )}
       <Circle
         radius={radius}
         stroke={isSelected ? "deeppink" : "black"}
@@ -34,18 +51,6 @@ function State({ id, name, x, y, isSelected, isFinal, onClick }: StateProps) {
         shadowOpacity={isSelected && !isFinal ? 1 : 0}
         fill={"white"}
       />
-      {isFinal && (
-        <Circle
-          radius={radius + 10}
-          strokeWidth={4}
-          stroke={isSelected ? "deeppink" : "black"}
-          shadowColor="deeppink"
-          shadowBlur={10}
-          shadowOffsetX={0}
-          shadowForStrokeEnabled={true}
-          shadowOpacity={isSelected ? 1 : 0}
-        />
-      )}
       <Text
         fontStyle="bold"
         fontFamily="JetBrains Mono"
