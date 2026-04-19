@@ -2,6 +2,10 @@
 import Canvas from "./Canvas";
 
 function App() {
-  return <Canvas />;
+  return (
+    <div class="flex flex-row basis-[100vw]">
+      <Canvas />
+    </div>
+  );
 }
 export default App;

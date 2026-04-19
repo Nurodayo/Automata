@@ -1,23 +1,41 @@
-import { Stage, Layer, Rect, Circle, Text } from "react-konva";
+import { Stage, Layer } from "react-konva";
+import { useState } from "react";
+import State from "./State";
 
-const App = () => {
+const Canvas = () => {
+  const [states, setStates] = useState([
+    { id: "q0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
+    { id: "q1", name: "q1", x: 160, y: 80, isSelected: false, isFinal: true },
+  ]);
+
+  //function to select and deselect states
+  const selectState = (id: string) => {
+    setStates((prev) =>
+      prev.map((state) => ({
+        ...state,
+        isSelected: state.id === id,
+      })),
+    );
+  };
   return (
     <Stage width={window.innerWidth} height={window.innerHeight}>
       <Layer>
-        <Text text="Try to drag shapes" fontSize={15} />
-        <Rect
-          x={20}
-          y={50}
-          width={100}
-          height={100}
-          fill="red"
-          shadowBlur={10}
-          draggable
-        />
-        <Circle x={200} y={100} radius={50} fill="green" draggable />
+        {/* iterating states */}
+        {states.map((state) => (
+          <State
+            key={state.id}
+            id={state.id}
+            name={state.name}
+            x={state.x}
+            y={state.y}
+            isSelected={state.isSelected}
+            isFinal={state.isFinal}
+            onClick={selectState}
+          />
+        ))}
       </Layer>
     </Stage>
   );
 };
 
-export default App;
+export default Canvas;
