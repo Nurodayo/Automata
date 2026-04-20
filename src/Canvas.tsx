@@ -1,5 +1,5 @@
 import { Stage, Layer } from "react-konva";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import State from "./State";
 import Curve from "./Curve";
 import Grid from "./Grid";
@@ -16,7 +16,7 @@ const Canvas = () => {
   // curva bezier entre los dos estados basada en las funciones de transicion
   // bezier curve between both states bases on transition functions (or however the hell they're called in english)
   // no sera la forma mas optimizada para hacer esto pero es muy parecido a la teoria
-  const [curves, setCurves] = useState([
+  const [curves] = useState([
     {
       id: "curve0",
       name: "curve0",

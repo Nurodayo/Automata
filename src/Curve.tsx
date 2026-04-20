@@ -1,4 +1,4 @@
-import { Group, Line, Text, Layer } from "react-konva";
+import { Group, Line, Text } from "react-konva";
 // TODO: Add arrow indicating flow direction
 type CurveProps = {
   start: number[];
