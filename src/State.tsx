@@ -10,6 +10,8 @@ type StateProps = {
   isFinal: boolean;
   onClick: (id: string) => void;
   onDragStart: (id: string) => void;
+  onDragEnd: (id: string, x: number, y: number) => void;
+  onDragoMove: (id: string, x: number, y: number) => void;
 };
 
 const radius = 40;
@@ -18,14 +20,34 @@ const radius = 40;
 //
 // TODO: Make a stylesheet to make switching from dark mode to light mode easier
 
-function State({ id, name, x, y, isSelected, isFinal, onClick }: StateProps) {
+function State({
+  id,
+  name,
+  x,
+  y,
+  isSelected,
+  isFinal,
+  onClick,
+  onDragStart,
+  onDragEnd,
+}: StateProps) {
   return (
     <Group
       x={x}
       y={y}
       draggable
       onClick={() => onClick(id)}
-      onDragStart={() => onClick(id)}
+      onDragStart={() => onDragStart(id)}
+      onDragEnd={(e) => {
+        const pos = e.target.position();
+        if (!pos) return;
+
+        onDragEnd(id, pos.x, pos.y);
+      }}
+      onDragMove={(e) => {
+        const { x, y } = e.target.position();
+        onDragEnd(id, x, y);
+      }}
     >
       {isFinal && (
         <Circle
