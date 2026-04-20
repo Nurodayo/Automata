@@ -1,5 +1,5 @@
 import { Stage, Layer } from "react-konva";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import State from "./State";
 import Curve from "./Curve";
 import Grid from "./Grid";
@@ -9,6 +9,16 @@ const Canvas = () => {
   const height = window.innerHeight;
   const width = window.innerWidth;
 
+  const gridSize: number = 40;
+  // Large Canvas but not infinite
+  // it might be hardcoded but who cares
+  const range: number = 5120; // 128x128 grid squares
+
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    console.log(position);
+  }, [position]);
   const [states, setStates] = useState([
     { id: "q0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
     { id: "q1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
@@ -25,6 +35,7 @@ const Canvas = () => {
       symbol: ["0", "1"],
     },
   ]);
+
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
   const selectState = (id: string) => {
@@ -49,6 +60,8 @@ const Canvas = () => {
       prev.map((state) => (state.id === id ? { ...state, x, y } : state)),
     );
   };
+
+  // We're going to calculate the grid Once
   return (
     <div>
       <Stage
@@ -59,9 +72,19 @@ const Canvas = () => {
             clearSelection();
           }
         }}
+        draggable
+        onDragMove={(e) => {
+          const stage = e.target;
+          setPosition({ x: stage.x(), y: stage.y() });
+        }}
       >
         <Layer>
-          <Grid width={width} height={height} gridSize={40} color="lightgray" />
+          <Grid
+            width={range}
+            height={range}
+            gridSize={gridSize}
+            color="lightgray"
+          />
         </Layer>
         <Layer>
           {/* iterating curves*/}
