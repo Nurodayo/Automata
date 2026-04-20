@@ -49,19 +49,6 @@ function State({
         onDragEnd(id, x, y);
       }}
     >
-      {isFinal && (
-        <Circle
-          radius={radius + 10}
-          strokeWidth={4}
-          stroke={isSelected ? "deeppink" : "black"}
-          fill="white"
-          shadowColor="deeppink"
-          shadowBlur={10}
-          shadowOffsetX={0}
-          shadowForStrokeEnabled={true}
-          shadowOpacity={isSelected ? 1 : 0}
-        />
-      )}
       <Circle
         radius={radius}
         stroke={isSelected ? "deeppink" : "black"}
@@ -70,9 +57,18 @@ function State({
         shadowBlur={10}
         shadowOffsetX={0}
         shadowForStrokeEnabled={true}
-        shadowOpacity={isSelected && !isFinal ? 1 : 0}
+        shadowOpacity={isSelected ? 1 : 0}
         fill={"white"}
       />
+      {isFinal && (
+        <Circle
+          radius={radius - 8}
+          strokeWidth={2}
+          stroke={isSelected ? "deeppink" : "black"}
+          fill="white"
+          shadowColor="deeppink"
+        />
+      )}
       <Text
         fontStyle="bold"
         fontFamily="JetBrains Mono"

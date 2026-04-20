@@ -17,9 +17,10 @@ function Curve({ start, end, symbol }: CurveProps) {
   };
   // extra point that smooths out the line
   const centroid = center(start, end, c);
+  //need to find a better looking position for the transition symbols
   const textPos: number[] = [
-    (c[0] + centroid[0]) / 2,
-    (c[1] + centroid[1]) / 2,
+    (centroid[0] + c[0]) / 2,
+    (centroid[1] + c[1]) / 2,
   ];
   return (
     <Group>
@@ -31,7 +32,11 @@ function Curve({ start, end, symbol }: CurveProps) {
       />
       <Text
         fontFamily="JetBrains Mono"
-        text={symbol[0]}
+        align="center"
+        verticalAlign="middle"
+        padding={8}
+        fontSize={20}
+        text={symbol.toString()}
         x={textPos[0]}
         y={textPos[1]}
       />
