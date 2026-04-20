@@ -1,4 +1,4 @@
-import { Group, Line, Text } from "react-konva";
+import { Group, Line, Text, Layer } from "react-konva";
 // TODO: Add arrow indicating flow direction
 type CurveProps = {
   start: number[];
@@ -18,16 +18,13 @@ function Curve({ start, end, symbol }: CurveProps) {
   // extra point that smooths out the line
   const centroid = center(start, end, c);
   //need to find a better looking position for the transition symbols
-  const textPos: number[] = [
-    (centroid[0] + c[0]) / 2,
-    (centroid[1] + c[1]) / 2,
-  ];
+  const textPos: number[] = [(start[0] + end[0]) / 2, (start[1] + end[1]) / 2];
   return (
     <Group>
       <Line
         points={[start[0], start[1], centroid[0], centroid[1], end[0], end[1]]}
         stroke="black"
-        strokeWidth={5}
+        strokeWidth={3}
         tension={0.5}
       />
       <Text
@@ -35,10 +32,13 @@ function Curve({ start, end, symbol }: CurveProps) {
         align="center"
         verticalAlign="middle"
         padding={8}
-        fontSize={20}
+        fontSize={24}
         text={symbol.toString()}
         x={textPos[0]}
         y={textPos[1]}
+        stroke="lightgray"
+        strokeWidth={0.75}
+        fill="black"
       />
     </Group>
   );

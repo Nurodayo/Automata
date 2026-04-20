@@ -2,8 +2,13 @@ import { Stage, Layer } from "react-konva";
 import { useState, useEffect } from "react";
 import State from "./State";
 import Curve from "./Curve";
+import Grid from "./Grid";
+//import texture from "./assets/grid_texture_64.png";
 
 const Canvas = () => {
+  const height = window.innerHeight;
+  const width = window.innerWidth;
+
   const [states, setStates] = useState([
     { id: "q0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
     { id: "q1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
@@ -47,14 +52,17 @@ const Canvas = () => {
   return (
     <div>
       <Stage
-        width={window.innerWidth}
-        height={window.innerHeight}
+        width={width}
+        height={height}
         onMouseDown={(e) => {
           if (e.target === e.target.getStage()) {
             clearSelection();
           }
         }}
       >
+        <Layer>
+          <Grid width={width} height={height} gridSize={40} color="lightgray" />
+        </Layer>
         <Layer>
           {/* iterating curves*/}
           {curves.map((curve) => {
@@ -72,7 +80,8 @@ const Canvas = () => {
               />
             );
           })}
-
+        </Layer>
+        <Layer>
           {/* iterating states */}
           {states.map((state) => (
             <State
