@@ -1,9 +1,12 @@
 // import "./App.css";
-import Canvas from "./Canvas";
+import Canvas from "./components/Canvas.tsx";
+import NavBar from "./components/NavBar.tsx";
+import "./index.css";
 
 function App() {
   return (
-    <div className="flex flex-row basis-[100vw]">
+    <div className="flex flex-col">
+      <NavBar />
       <Canvas />
     </div>
   );
