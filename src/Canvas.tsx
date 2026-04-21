@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import State from "./State";
 import Curve from "./Curve";
 import Grid from "./Grid";
-//import texture from "./assets/grid_texture_64.png";
+import type { KonvaEventObject } from "konva/lib/Node";
+import Konva from "konva";
 
 const Canvas = () => {
   const height = window.innerHeight;
@@ -12,7 +13,7 @@ const Canvas = () => {
   const gridSize: number = 40;
   // Large Canvas but not infinite
   // it might be hardcoded but who cares
-  const range: number = 5120; // 128x128 grid squares
+  const range: number = 3840; // 96x96 grid squares
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
@@ -36,6 +37,7 @@ const Canvas = () => {
     },
   ]);
 
+  //const stageRef = useRef(null); // does not seem to be necesary
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
   const selectState = (id: string) => {
@@ -61,6 +63,32 @@ const Canvas = () => {
     );
   };
 
+  const scaleBy: number = 1.2;
+  // si esta en la documentacion oficial espero que no cause problemas de rendimiento
+  const handleWheel = (e: KonvaEventObject<WheelEvent, Konva.Stage>) => {
+    e.evt.preventDefault();
+    const stage = e.target.getStage();
+    if (!stage) return;
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition();
+    if (!pointer) return;
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+    let direction = e.evt.deltaY > 0 ? -1 : 1;
+    if (e.evt.ctrlKey) {
+      direction = -direction;
+    }
+    let newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+    newScale = Math.max(0.1, Math.min(10, newScale));
+    stage.scale({ x: newScale, y: newScale });
+    stage.position({
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    });
+  };
+
   // We're going to calculate the grid Once
   return (
     <div>
@@ -77,6 +105,7 @@ const Canvas = () => {
           const stage = e.target;
           setPosition({ x: stage.x(), y: stage.y() });
         }}
+        onWheel={handleWheel}
       >
         <Layer>
           <Grid
