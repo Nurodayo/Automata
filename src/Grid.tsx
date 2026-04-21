@@ -10,11 +10,11 @@ type LineProps = {
 function Grid({ width, height, gridSize, color }: LineProps) {
   const lines = [];
   // vertical lines
-  for (let i = 0; i <= width / gridSize; i++) {
+  for (let i = -(width / 2); i <= width / 2; i += gridSize) {
     lines.push(
       <Line
         key={`v-${i}`}
-        points={[i * gridSize, 0, i * gridSize, height]}
+        points={[i, -height / 2, i, height / 2]}
         strokeWidth={1}
         stroke={color}
       />,
@@ -22,11 +22,11 @@ function Grid({ width, height, gridSize, color }: LineProps) {
   }
 
   // horizontal lines
-  for (let i = 0; i <= height / gridSize; i++) {
+  for (let i = -(height / 2); i <= height / 2; i += gridSize) {
     lines.push(
       <Line
         key={`h-${i}`}
-        points={[0, i * gridSize, width, i * gridSize]}
+        points={[-width / 2, i, width / 2, i]}
         strokeWidth={1}
         stroke={color}
       />,
