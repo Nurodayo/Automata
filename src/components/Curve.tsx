@@ -1,5 +1,4 @@
-import { Group, Line, Text, RegularPolygon } from "react-konva";
-// TODO: Add arrow indicating flow direction
+import { Group, Arrow, Text } from "react-konva";
 type CurveProps = {
   start: number[];
   end: number[];
@@ -20,10 +19,10 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
   const centroid = center(start, end, c);
 
   // pendiente de una reta
-  const m: number = (end[1] - centroid[1]) / (end[0] - centroid[0]);
+  // const m: number = (end[1] - centroid[1]) / (end[0] - centroid[0]);
 
   // atan works in radians but konva needs the angle in degrees. bummer
-  const ang: number = Math.atan(m) * (180 / Math.PI);
+  // const ang: number = Math.atan(m) * (180 / Math.PI);
   // We get the unit vector and then multiply it by the radius to start the curve at the edge of the state
   const normalize = (p: number[]) => {
     const denom = Math.sqrt(p[0] ** 2 + p[1] ** 2);
@@ -50,10 +49,10 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
     end[1] - radius * unitV2[1],
   ];
   // 3 is the radius of the polygon at the end of the curve
-  const endArrow: number[] = [
-    end[0] - (radius + 3) * unitV2[0],
-    end[1] - (radius + 3) * unitV2[1],
-  ];
+  // const endArrow: number[] = [
+  //   end[0] - (radius + 3) * unitV2[0],
+  //   end[1] - (radius + 3) * unitV2[1],
+  // ];
 
   //need to find a better looking position for the transition symbols
   const textPos: number[] = [
@@ -62,7 +61,7 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
   ];
   return (
     <Group>
-      <Line
+      <Arrow
         points={[
           startEdge[0],
           startEdge[1],
@@ -74,14 +73,7 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
         stroke="black"
         strokeWidth={3}
         tension={0.6}
-      />
-      <RegularPolygon
-        x={endArrow[0]}
-        y={endArrow[1]}
-        sides={3}
-        radius={10}
         fill="black"
-        rotation={90 + ang}
       />
       <Text
         fontFamily="JetBrains Mono"
