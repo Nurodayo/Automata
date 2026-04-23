@@ -11,10 +11,10 @@ const Canvas = () => {
   const width = window.innerWidth;
   const radius: number = 40;
 
-  const gridSize: number = 40;
+  const gridSize: number = 60;
   // Large Canvas but not infinite
   // it might be hardcoded but who cares
-  const range: number = 3840; // 96x96 grid squares
+  const range: number = 3840; // 64x64 grid squares
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
@@ -93,9 +93,10 @@ const Canvas = () => {
   // We're going to calculate the grid Once
   return (
     <div>
+      {/* height / 16 is to account for the navbar*/}
       <Stage
         width={width}
-        height={height}
+        height={height - height / 16}
         onMouseDown={(e) => {
           if (e.target === e.target.getStage()) {
             clearSelection();

@@ -79,7 +79,6 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
         fontFamily="JetBrains Mono"
         align="center"
         verticalAlign="middle"
-        padding={8}
         fontSize={24}
         text={symbol.toString()}
         x={textPos[0]}
