@@ -9,6 +9,7 @@ import Konva from "konva";
 const Canvas = () => {
   const height = window.innerHeight;
   const width = window.innerWidth;
+  const radius: number = 40;
 
   const gridSize: number = 40;
   // Large Canvas but not infinite
@@ -129,6 +130,7 @@ const Canvas = () => {
                 start={[from.x, from.y]}
                 end={[to.x, to.y]}
                 symbol={curve.symbol}
+                radius={radius}
               />
             );
           })}
