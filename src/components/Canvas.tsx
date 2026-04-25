@@ -5,6 +5,7 @@ import Curve from "./Curve";
 import Grid from "./Grid";
 import type { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
+import RightClickMenu from "./RightClickMenu";
 
 const Canvas = () => {
   const height = window.innerHeight;
@@ -17,6 +18,15 @@ const Canvas = () => {
   const range: number = 3840; // 64x64 grid squares
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const menuOptions = [
+    {
+      id: "0",
+      label: "Create State.",
+      method: () => console.log("Create state"),
+    },
+    { id: "1", label: "Delete State.", method: () => console.log("Deleted") },
+  ];
 
   useEffect(() => {
     console.log(position);
@@ -94,6 +104,9 @@ const Canvas = () => {
   return (
     <div>
       {/* height / 16 is to account for the navbar*/}
+      <div>
+        <RightClickMenu options={menuOptions} />
+      </div>
       <Stage
         width={width}
         height={height - height / 16}

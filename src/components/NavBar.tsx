@@ -10,7 +10,7 @@ function NavBar() {
         <p className="font-bold text-3xl">Nurin Automata</p>
         {/*Animacion bonita jujujuj*/}
         <a
-          className="ml-auto transition transform easy-in duration-300 hover:scale-120 hover:text-red-500"
+          className="ml-auto transition transform easy-in duration-300 hover:scale-120 hover:text-pink-500"
           href="https://github.com/Nurodayo/Automata"
           rel="noopener noreferrer"
         >
