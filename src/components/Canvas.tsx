@@ -7,6 +7,15 @@ import type { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 import RightClickMenu from "./RightClickMenu";
 
+type state = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+  isSelected: boolean;
+  isFinal: boolean;
+};
+
 const Canvas = () => {
   const height = window.innerHeight;
   const width = window.innerWidth;
@@ -19,22 +28,33 @@ const Canvas = () => {
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const menuOptions = [
-    {
-      id: "0",
-      label: "Create State.",
-      method: () => console.log("Create state"),
-    },
-    { id: "1", label: "Delete State.", method: () => console.log("Deleted") },
-  ];
-
   useEffect(() => {
     console.log(position);
   }, [position]);
   const [states, setStates] = useState([
-    { id: "q0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
-    { id: "q1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
+    { id: "0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
+    { id: "1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
   ]);
+
+  const createStates = () => {
+    const prev = states;
+    const newId: string = prev.length.toString();
+
+    const name = "q".concat(newId);
+
+    const newState = {
+      id: newId,
+      name: name,
+      x: 0,
+      y: 0,
+      isSelected: true,
+      isFinal: false,
+    };
+    const newArray = [...prev];
+    newArray.push(newState);
+    setStates(newArray);
+  };
+
   // curva bezier entre los dos estados basada en las funciones de transicion
   // bezier curve between both states bases on transition functions (or however the hell they're called in english)
   // no sera la forma mas optimizada para hacer esto pero es muy parecido a la teoria
@@ -42,8 +62,8 @@ const Canvas = () => {
     {
       id: "curve0",
       name: "curve0",
-      start: "q0",
-      end: "q1",
+      start: "0",
+      end: "1",
       symbol: ["0", "1"],
     },
   ]);
@@ -99,6 +119,14 @@ const Canvas = () => {
       y: pointer.y - mousePointTo.y * newScale,
     });
   };
+  const menuOptions = [
+    {
+      id: "0",
+      label: "Create State.",
+      method: createStates,
+    },
+    { id: "1", label: "Delete State.", method: () => console.log("Deleted") },
+  ];
 
   // We're going to calculate the grid Once
   return (
