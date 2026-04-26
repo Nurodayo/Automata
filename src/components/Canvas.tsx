@@ -1,5 +1,5 @@
 import { Stage, Layer } from "react-konva";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import State from "./State";
 import Curve from "./Curve";
 import Grid from "./Grid";
@@ -8,6 +8,7 @@ import Konva from "konva";
 import RightClickMenu from "./RightClickMenu";
 
 const Canvas = () => {
+  const stageRef = useRef<Konva.Stage | null>(null);
   const height = window.innerHeight;
   const width = window.innerWidth;
   const radius: number = 40;
@@ -53,7 +54,6 @@ const Canvas = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   // i was getting the position onDragMove before but i will use it for something else later on like setting the camera on set cordinates
   // this console.log is here so it wont throw an error because i'm not using the constant
-  console.log(position);
   // useEffect(() => {
   //   console.log(position);
   // }, [position]);
@@ -94,6 +94,13 @@ const Canvas = () => {
       end: "1",
       symbol: ["0", "1"],
     },
+    {
+      id: "curve1",
+      name: "curve1",
+      start: "1",
+      end: "1",
+      symbol: ["0"],
+    },
   ]);
 
   //const stageRef = useRef(null); // does not seem to be necesary
@@ -120,6 +127,15 @@ const Canvas = () => {
     setStates((prev) =>
       prev.map((state) => (state.id === id ? { ...state, x, y } : state)),
     );
+  };
+
+  const goToCenter = (e: Konva.Stage | null) => {
+    if (!e) return;
+    e.x(0);
+    e.y(0);
+
+    setPosition({ x: 0, y: 0 });
+    console.log(position);
   };
 
   const scaleBy: number = 1.2;
@@ -153,7 +169,12 @@ const Canvas = () => {
       label: "Create State.",
       method: createStates,
     },
-    { id: "1", label: "Delete State.", method: () => console.log("Deleted") },
+    {
+      id: "1",
+      label: "Center Camera.",
+      method: () => goToCenter(stageRef.current),
+    },
+    { id: "2", label: "Delete State.", method: () => console.log("Deleted") },
   ];
 
   // We're going to calculate the grid Once
@@ -161,6 +182,7 @@ const Canvas = () => {
     <div>
       {/* height / 16 is to account for the navbar*/}
       <Stage
+        ref={stageRef}
         width={width}
         height={height - height / 16}
         onMouseDown={(e) => {
@@ -169,10 +191,6 @@ const Canvas = () => {
           }
         }}
         draggable
-        onDragMove={(e) => {
-          const stage = e.target;
-          setPosition({ x: stage.x(), y: stage.y() });
-        }}
         onWheel={handleWheel}
         onContextMenu={handleContextMenu}
       >
