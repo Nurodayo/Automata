@@ -7,13 +7,18 @@ type MenuOptions = {
 };
 type MenuProps = {
   options: MenuOptions[];
+  x: number;
+  y: number;
 };
 // i hate styling
 // We pass an object in Canvas.tsx which is going to have a label for the button and the function that it will on click
 // this file is going to be mostly style
-function RightClickMenu({ options }: MenuProps) {
+function RightClickMenu({ options, x, y }: MenuProps) {
   return (
-    <div className="flex flex-col border-1 border-black/50 w-64 rounded-md">
+    <div
+      style={{ left: x, top: y }}
+      className="flex flex-col border-1 border-black/50 w-64 rounded-md z-10 fixed bg-white"
+    >
       <div className="flex flex-row p-2">
         <RiFunctionFill size={32} />
         <p className="text-2xl font-medium">Menu</p>
