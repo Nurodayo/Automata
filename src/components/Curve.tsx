@@ -16,7 +16,7 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
     return centroid;
   };
   // extra point that smooths out the line
-  const centroid = center(start, end, c);
+  let centroid = center(start, end, c);
 
   // pendiente de una reta
   // const m: number = (end[1] - centroid[1]) / (end[0] - centroid[0]);
@@ -26,6 +26,10 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
   // We get the unit vector and then multiply it by the radius to start the curve at the edge of the state
   const normalize = (p: number[]) => {
     const denom = Math.sqrt(p[0] ** 2 + p[1] ** 2);
+    // avoid divide by 0
+    if (denom === 0) {
+      return [0, 0];
+    }
     const unitVector = [p[0] / denom, p[1] / denom];
     return unitVector;
   };
@@ -39,15 +43,27 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
     -centroid[1] + end[1],
   ]);
 
-  const startEdge: number[] = [
-    start[0] + radius * unitV1[0],
-    start[1] + radius * unitV1[1],
-  ];
+  // Perdon profe diego por usar let se que lo defraude
+  // Medina le manda saludos
+  const sqrt2: number = Math.sqrt(2);
 
-  const endEdge: number[] = [
-    end[0] - radius * unitV2[0],
-    end[1] - radius * unitV2[1],
-  ];
+  let startEdge: number[];
+  let endEdge: number[];
+
+  if (unitV1[0] !== 0 && unitV1[1] !== 0) {
+    startEdge = [start[0] + radius * unitV1[0], start[1] + radius * unitV1[1]];
+
+    endEdge = [end[0] - radius * unitV2[0], end[1] - radius * unitV2[1]];
+  } else {
+    startEdge = [
+      start[0] + radius * (sqrt2 / 2),
+      start[1] + radius * (sqrt2 / 2),
+    ];
+
+    endEdge = [end[0] - radius * (sqrt2 / 2), end[1] + radius * (sqrt2 / 2)];
+
+    centroid = [(startEdge[0] + endEdge[0]) / 2, start[1] + 90];
+  }
   // 3 is the radius of the polygon at the end of the curve
   // const endArrow: number[] = [
   //   end[0] - (radius + 3) * unitV2[0],
@@ -55,10 +71,17 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
   // ];
 
   //need to find a better looking position for the transition symbols
-  const textPos: number[] = [
-    (startEdge[0] + endEdge[0]) / 2,
-    (startEdge[1] + endEdge[1]) / 2,
-  ];
+  let textPos: number[];
+
+  if (unitV1[0] !== 0 && unitV1[1] !== 0) {
+    textPos = [
+      (startEdge[0] + endEdge[0]) / 2,
+      (startEdge[1] + endEdge[1]) / 2,
+    ];
+  } else {
+    // it does not matter if we chose start or end
+    textPos = [(startEdge[0] + endEdge[0]) / 2, start[1] + 100];
+  }
   return (
     <Group>
       <Arrow
