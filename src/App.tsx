@@ -2,6 +2,7 @@
 import Konva from "konva";
 import Canvas from "./components/Canvas.tsx";
 import NavBar from "./components/NavBar.tsx";
+import SideBar from "./components/SideBar";
 import "./index.css";
 
 //resolution will be 90% of the window
@@ -11,7 +12,9 @@ function App() {
   return (
     <div className="flex flex-col">
       <NavBar />
-      <Canvas />
+      <div className="flex flex-row">
+        <Canvas />
+      </div>
     </div>
   );
 }

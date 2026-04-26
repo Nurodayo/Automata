@@ -1,4 +1,7 @@
 import { Group, Arrow, Text } from "react-konva";
+import { useRef, useEffect } from "react";
+import Konva from "konva";
+
 type CurveProps = {
   start: number[];
   end: number[];
@@ -8,8 +11,15 @@ type CurveProps = {
 // we don't need the id here but rather in the canvas
 function Curve({ start, end, symbol, radius }: CurveProps) {
   // we calculate the centroid of the triangle to make the curve look a little better
+  const TextRef = useRef<Konva.Text | null>(null);
   const c: number[] = [start[0], end[1]];
-
+  useEffect(() => {
+    const text = TextRef.current;
+    if (text) {
+      text.offsetX(text.width() / 2);
+      text.offsetY(text.height() / 2);
+    }
+  }, [symbol]); // importante si cambia el texto
   // i dont think that passing arrays with more than two numbers will break it so i'll leave it like that
   const center = (a: number[], b: number[], c: number[]) => {
     const centroid = [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3];
@@ -49,8 +59,8 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
 
   let startEdge: number[];
   let endEdge: number[];
-
-  if (unitV1[0] !== 0 && unitV1[1] !== 0) {
+  // estaba checkeando si la distancia era 0 antes pero esto es mas facil
+  if (start[0] !== end[0] && start[1] !== end[1]) {
     startEdge = [start[0] + radius * unitV1[0], start[1] + radius * unitV1[1]];
 
     endEdge = [end[0] - radius * unitV2[0], end[1] - radius * unitV2[1]];
@@ -73,14 +83,14 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
   //need to find a better looking position for the transition symbols
   let textPos: number[];
 
-  if (unitV1[0] !== 0 && unitV1[1] !== 0) {
+  if (start[0] !== end[0] && start[1] !== end[1]) {
     textPos = [
       (startEdge[0] + endEdge[0]) / 2,
       (startEdge[1] + endEdge[1]) / 2,
     ];
   } else {
     // it does not matter if we chose start or end
-    textPos = [(startEdge[0] + endEdge[0]) / 2, start[1] + 100];
+    textPos = [(startEdge[0] + endEdge[0]) / 2, start[1] + 110];
   }
   return (
     <Group>
@@ -99,6 +109,7 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
         fill="black"
       />
       <Text
+        ref={TextRef}
         fontFamily="JetBrains Mono"
         align="center"
         verticalAlign="middle"
