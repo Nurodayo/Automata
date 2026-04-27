@@ -185,8 +185,8 @@ const Canvas = () => {
       {/* height / 16 is to account for the navbar*/}
       <Stage
         ref={stageRef}
-        width={width - 96 * 4}
-        height={height - height / 16}
+        width={width - width * 0.2}
+        height={height - height * (6 / 100)}
         onMouseDown={(e) => {
           if (e.target === e.target.getStage()) {
             clearSelection();

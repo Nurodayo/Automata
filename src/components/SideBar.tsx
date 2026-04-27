@@ -3,17 +3,26 @@
 
 function SideBar() {
   return (
-    <div className="flex flex-col w-96 border-r-1 border-black/50">
-      <div className="w-90 mr-auto ml-auto p-2">
-        <p className="">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
-        </p>
+    <div className="flex flex-col w-[20vw] border-r-1 border-black/50">
+      <div className="w-full mr-auto ml-auto p-2">
+        <div className="flex gap-1 w-full">
+          <button className="flex-1 truncate text-lg border border-black/50 rounded-full py-1">
+            State
+          </button>
+          <button className="flex-1 truncate text-lg border border-black/50 rounded-full py-1">
+            Settings
+          </button>
+        </div>
+      </div>
+      <div className="w-full mr-auto ml-auto p-2">
+        <div className="flex gap-1 w-full">
+          <p className="flex-1 truncate text-xl text-center rounded-full font-medium py-1">
+            Current State
+          </p>
+          <button className="flex-1 truncate text-lg border border-black/50 rounded-full py-1">
+            Settings
+          </button>
+        </div>
       </div>
     </div>
   );

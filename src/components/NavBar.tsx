@@ -5,8 +5,8 @@ function NavBar() {
   console.log("Welcome to MaidKissa");
 
   return (
-    <div className="flex justify-center border-b-[1px] border-black/50">
-      <div className="flex w-[min(100vw,177.77vh)] items-center px-4 h-16">
+    <div className="flex justify-center border-b-[1px] border-black/50 h-[6vh]">
+      <div className="flex w-[min(100vw,177.77vh)] items-center px-4">
         <p className="font-bold text-3xl">Nurin Automata</p>
         {/*Animacion bonita jujujuj*/}
         <a

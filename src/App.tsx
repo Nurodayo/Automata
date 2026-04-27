@@ -9,7 +9,7 @@ Konva.pixelRatio = 0.9;
 
 function App() {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col h-full">
       <NavBar />
       <div className="flex flex-row">
         <Canvas />
