@@ -17,7 +17,7 @@ function RightClickMenu({ options, x, y }: MenuProps) {
   return (
     <div
       style={{ left: x, top: y }}
-      className="flex flex-col border-1 border-black/50 w-64 rounded-md z-10 fixed bg-white"
+      className="flex flex-col border-1 border-black/50 w-64 rounded-md z-10 fixed bg-white dark:bg-slate-800 dark:text-white dark: border-white/50"
     >
       <div className="flex flex-row p-2">
         <RiFunctionFill size={32} />
@@ -28,7 +28,8 @@ function RightClickMenu({ options, x, y }: MenuProps) {
           <button
             key={e.id}
             onClick={e.method}
-            className="p-1 w-62 hover:bg-gray-200 rounded-md align-start text-lg justify-center border-b-1 border-transparent hover:border-gray-500  duration-200 ease-in-out"
+            className="p-1 w-62 hover:bg-gray-200 rounded-md align-start text-lg justify-center border-b-1 border-transparent hover:border-gray-500  duration-200 ease-in-out 
+            dark:hover:bg-slate-700 dark:hover:border-slate-500"
           >
             {e.label}
           </button>
