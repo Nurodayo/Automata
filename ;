@@ -6,11 +6,8 @@ import Grid from "./Grid";
 import type { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 import RightClickMenu from "./RightClickMenu";
-import SideBar from "./SideBar";
-import useTheme from "../hooks/useTheme";
 
 const Canvas = () => {
-  const theme = useTheme((e) => e.bool);
   const stageRef = useRef<Konva.Stage | null>(null);
   const height = window.innerHeight;
   const width = window.innerWidth;
@@ -97,13 +94,6 @@ const Canvas = () => {
       end: "1",
       symbol: ["0", "1"],
     },
-    {
-      id: "curve1",
-      name: "curve1",
-      start: "1",
-      end: "1",
-      symbol: ["0"],
-    },
   ]);
 
   //const stageRef = useRef(null); // does not seem to be necesary
@@ -136,9 +126,9 @@ const Canvas = () => {
     if (!e) return;
     e.x(0);
     e.y(0);
+    e.batchDraw();
 
     setPosition({ x: 0, y: 0 });
-    console.log(position);
   };
 
   const scaleBy: number = 1.2;
@@ -182,13 +172,12 @@ const Canvas = () => {
 
   // We're going to calculate the grid Once
   return (
-    <div className="flex flex-row">
-      <SideBar />
+    <div>
       {/* height / 16 is to account for the navbar*/}
       <Stage
         ref={stageRef}
-        width={width - width * 0.2}
-        height={height - height * (6 / 100)}
+        width={width}
+        height={height - height / 16}
         onMouseDown={(e) => {
           if (e.target === e.target.getStage()) {
             clearSelection();
@@ -197,16 +186,13 @@ const Canvas = () => {
         draggable
         onWheel={handleWheel}
         onContextMenu={handleContextMenu}
-        style={{
-          backgroundColor: theme ? "white" : "black",
-        }}
       >
         <Layer>
           <Grid
             width={range}
             height={range}
             gridSize={gridSize}
-            color={theme ? "lightgray" : "grey"}
+            color="lightgray"
           />
         </Layer>
         <Layer>
