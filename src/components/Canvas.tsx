@@ -7,8 +7,10 @@ import type { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 import RightClickMenu from "./RightClickMenu";
 import SideBar from "./SideBar";
+import useTheme from "../hooks/useTheme";
 
 const Canvas = () => {
+  const theme = useTheme((e) => e.bool);
   const stageRef = useRef<Konva.Stage | null>(null);
   const height = window.innerHeight;
   const width = window.innerWidth;
@@ -195,13 +197,16 @@ const Canvas = () => {
         draggable
         onWheel={handleWheel}
         onContextMenu={handleContextMenu}
+        style={{
+          backgroundColor: theme ? "white" : "black",
+        }}
       >
         <Layer>
           <Grid
             width={range}
             height={range}
             gridSize={gridSize}
-            color="lightgray"
+            color={theme ? "lightgray" : "grey"}
           />
         </Layer>
         <Layer>

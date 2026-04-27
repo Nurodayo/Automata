@@ -10,7 +10,7 @@ function NavBar() {
   const toggle = useTheme((e) => e.toggle);
 
   return (
-    <div className="flex justify-center border-b-[1px] border-black/50 h-[6vh] dark:bg-slate-800 dark:text-white dark:border-white/50">
+    <div className="flex justify-center border-b-[1px] border-black/50 h-[6vh] dark:bg-black dark:text-white dark:border-white/50">
       <div className="flex w-[min(100vw,177.77vh)] items-center px-4">
         <p className="font-bold text-3xl">Nurin Automata</p>{" "}
         <div className="ml-auto flex flex-row">

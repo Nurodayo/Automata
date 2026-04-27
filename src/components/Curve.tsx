@@ -1,6 +1,7 @@
 import { Group, Arrow, Text } from "react-konva";
 import { useRef, useEffect } from "react";
 import Konva from "konva";
+import useTheme from "../hooks/useTheme";
 
 type CurveProps = {
   start: number[];
@@ -11,6 +12,8 @@ type CurveProps = {
 // we don't need the id here but rather in the canvas
 function Curve({ start, end, symbol, radius }: CurveProps) {
   // we calculate the centroid of the triangle to make the curve look a little better
+  const theme = useTheme((e) => e.bool);
+
   const TextRef = useRef<Konva.Text | null>(null);
   const c: number[] = [start[0], end[1]];
   useEffect(() => {
@@ -103,10 +106,10 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
           endEdge[0],
           endEdge[1],
         ]}
-        stroke="black"
+        stroke={theme ? "black" : "white"}
         strokeWidth={3}
         tension={0.6}
-        fill="black"
+        fill={theme ? "black" : "white"}
       />
       <Text
         ref={TextRef}
@@ -117,9 +120,9 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
         text={symbol.toString()}
         x={textPos[0]}
         y={textPos[1]}
-        stroke="lightgray"
+        stroke={theme ? "lightgray" : "grey"}
         strokeWidth={0.75}
-        fill="black"
+        fill={theme ? "black" : "white"}
       />
     </Group>
   );

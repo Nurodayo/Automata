@@ -17,7 +17,7 @@ function RightClickMenu({ options, x, y }: MenuProps) {
   return (
     <div
       style={{ left: x, top: y }}
-      className="flex flex-col border-1 border-black/50 w-64 rounded-md z-10 fixed bg-white dark:bg-slate-800 dark:text-white dark: border-white/50"
+      className="flex flex-col border-1 border-black/50 w-64 rounded-md z-10 fixed bg-white dark:bg-black dark:text-white dark: border-white/50"
     >
       <div className="flex flex-row p-2">
         <RiFunctionFill size={32} />

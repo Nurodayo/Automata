@@ -1,5 +1,5 @@
 import { Circle, Text, Group } from "react-konva";
-
+import useTheme from "../hooks/useTheme";
 //props
 type StateProps = {
   id: string;
@@ -31,6 +31,8 @@ function State({
   onDragStart,
   onDragEnd,
 }: StateProps) {
+  const theme = useTheme((e) => e.bool);
+
   return (
     <Group
       x={x}
@@ -51,21 +53,21 @@ function State({
     >
       <Circle
         radius={radius}
-        stroke={isSelected ? "deeppink" : "black"}
+        stroke={isSelected ? "deeppink" : theme ? "black" : "white"}
         strokeWidth={4}
         shadowColor="deeppink"
         shadowBlur={10}
         shadowOffsetX={0}
         shadowForStrokeEnabled={true}
         shadowOpacity={isSelected ? 1 : 0}
-        fill={"white"}
+        fill={theme ? "white" : "black"}
       />
       {isFinal && (
         <Circle
           radius={radius - 8}
           strokeWidth={2}
-          stroke={isSelected ? "deeppink" : "black"}
-          fill="white"
+          stroke={isSelected ? "deeppink" : theme ? "black" : "white"}
+          fill={theme ? "white" : "black"}
           shadowColor="deeppink"
         />
       )}
@@ -79,7 +81,7 @@ function State({
         offsetX={40}
         align="center"
         text={name}
-        fill={isSelected ? "deeppink" : "black"}
+        fill={isSelected ? "deeppink" : theme ? "black" : "white"}
       />
     </Group>
   );
