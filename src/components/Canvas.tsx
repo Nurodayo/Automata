@@ -69,14 +69,14 @@ const Canvas = () => {
   const createStates = () => {
     clearSelection();
     const prev = states;
-    const newId: string = prev.length.toString();
+    const newId: string = crypto.randomUUID();
 
-    const name = "q".concat(newId);
-    // TODO: Fix the id system
+    const name = "q".concat(prev.length.toString());
+    // Done
     const newState = {
       id: newId,
       name: name,
-      x: menuPosition.x,
+      x: menuPosition.x - 64 * 4, //that fixes the states spawning way off the right
       y: menuPosition.y,
       isSelected: true,
       isFinal: false,
@@ -183,7 +183,7 @@ const Canvas = () => {
   // We're going to calculate the grid Once
   return (
     <div className="flex flex-row">
-      <SideBar />
+      <SideBar states={states} curves={curves} />
       {/* height / 16 is to account for the navbar*/}
       <Stage
         ref={stageRef}
