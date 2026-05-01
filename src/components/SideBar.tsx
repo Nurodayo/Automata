@@ -1,6 +1,6 @@
 import Select from "react-select";
 import useTheme from "../hooks/useTheme";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 //Este sidebar te permitira conectar estados, seleccionar simbolos de transicion
 //Hacer que los estados sean terminales entre otras cosas
@@ -26,25 +26,32 @@ type CurveType = {
 type SideBarProps = {
   states: StateType[];
   curves: CurveType[];
+  clickedStateId: string | null;
+  setClickedStateId: (id: string | null) => void;
 };
 
-type Options = {
-  value: string;
-  label: string;
-};
+// type Options = {
+//   value: string;
+//   label: string;
+// };
 
-function SideBar({ states, curves }: SideBarProps) {
+// we pass an useState() (the constant and the setter so the select can update when you click the canvas)
+function SideBar({
+  states,
+  curves,
+  clickedStateId,
+  setClickedStateId,
+}: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
-  const [selectedState, setSelectedState] = useState<Options | null>(null);
+  const selectedOption =
+    stateOptions.find((opt) => opt.value === clickedStateId) || null;
   // const [symbols, setSymbols] = useState([""]); //needed later to edit symbols
 
   //find curves that start on the state that the user has selected using the ui
   const filterCurves = () => {
-    if (!selectedState) return;
-    const selectedCurves = curves.filter(
-      (e) => e.start === selectedState.value,
-    );
+    if (!clickedStateId) return;
+    const selectedCurves = curves.filter((e) => e.start === clickedStateId);
     // we do this so that new states print that there are no transitions
     if (selectedCurves.length === 0) return null;
     return selectedCurves;
@@ -53,6 +60,10 @@ function SideBar({ states, curves }: SideBarProps) {
   const filteredCurves = filterCurves();
   //just realized i need another useState to select an specific filtered curves
   const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
+  // complains about infinite rerenders but it works fine
+  useEffect(() => {
+    setSelectedCurve(null);
+  }, [clickedStateId]);
 
   // TODO: Add settings tab but that can probably wait after the presentation
   return (
@@ -74,10 +85,9 @@ function SideBar({ states, curves }: SideBarProps) {
           </p>
           {/* Select */}
           <Select
-            value={selectedState}
+            value={selectedOption}
             onChange={(e) => {
-              setSelectedState(e);
-              setSelectedCurve(null);
+              setClickedStateId(e?.value ?? null);
             }}
             options={stateOptions}
             styles={{

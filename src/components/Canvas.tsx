@@ -105,7 +105,8 @@ const Canvas = () => {
       symbol: ["0"],
     },
   ]);
-
+  // Last id of the last clicked state
+  const [clickedState, setClickedState] = useState<string | null>(null);
   //const stageRef = useRef(null); // does not seem to be necesary
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
@@ -116,6 +117,7 @@ const Canvas = () => {
         isSelected: state.id === id,
       })),
     );
+    setClickedState(id);
   };
   // Deselect when clicking the canvas
   const clearSelection = () => {
@@ -134,8 +136,8 @@ const Canvas = () => {
 
   const goToCenter = (e: Konva.Stage | null) => {
     if (!e) return;
-    e.x(0);
-    e.y(0);
+    e.x(0 - width / 2);
+    e.y(0 - height / 2);
 
     setPosition({ x: 0, y: 0 });
     console.log(position);
@@ -183,7 +185,12 @@ const Canvas = () => {
   // We're going to calculate the grid Once
   return (
     <div className="flex flex-row">
-      <SideBar states={states} curves={curves} />
+      <SideBar
+        states={states}
+        curves={curves}
+        clickedStateId={clickedState}
+        setClickedStateId={setClickedState}
+      />
       {/* height / 16 is to account for the navbar*/}
       <Stage
         ref={stageRef}
