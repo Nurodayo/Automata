@@ -2,6 +2,8 @@ import Select from "react-select";
 import useTheme from "../hooks/useTheme";
 import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
+import { FaMinus } from "react-icons/fa";
 //Este sidebar te permitira conectar estados, seleccionar simbolos de transicion
 //Hacer que los estados sean terminales entre otras cosas
 
@@ -175,12 +177,31 @@ function SideBar({
                   `}
                   onClick={() => setSelectedCurve(o)}
                 >
-                  {o.name}
+                  {/*Surely using an ascii arrow wont introduce problems later on. Right?*/}
+                  {/*if i did this in js instead of ts i would've been done with this long ago but i chose pain*/}
+                  {states ? (
+                    `${states.find((s: StateType) => s.id === o.start)?.name ?? "?"} → ${states.find((s: StateType) => s.id === o.end)?.name ?? "?"}`
+                  ) : (
+                    <p className="text-red-500">
+                      No states associated to this transition.
+                    </p>
+                  )}
                 </div>
               ))
             ) : (
               <p className="text-center p-2">No Transitions found.</p>
             )}
+          </div>
+          {/* Create states buttons */}
+          <div className="p-1">
+            <div className="flex gap-1 w-full">
+              <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+                <FaPlus className="m-auto" />
+              </button>
+              <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+                <FaMinus className="m-auto" />
+              </button>
+            </div>
           </div>
         </div>
         {/* Symbols */}
@@ -200,8 +221,19 @@ function SideBar({
                 </div>
               ))
             ) : (
-              <p className="text-center p-2">No Transitions found.</p>
+              <p className="text-center p-2">No Transitions Selected.</p>
             )}
+          </div>
+        </div>
+        {/* Add symbols button */}
+        <div className="p-1">
+          <div className="flex gap-1 w-full">
+            <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+              <FaPlus className="m-auto" />
+            </button>
+            <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+              <FaMinus className="m-auto" />
+            </button>
           </div>
         </div>
       </div>
