@@ -1,9 +1,11 @@
 import Select from "react-select";
 import useTheme from "../hooks/useTheme";
 import { useState } from "react";
+import { FaEdit } from "react-icons/fa";
 //Este sidebar te permitira conectar estados, seleccionar simbolos de transicion
 //Hacer que los estados sean terminales entre otras cosas
 
+// This is all about transitioning !!! 🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️
 type StateType = {
   id: string;
   name: string;
@@ -33,10 +35,9 @@ type Options = {
 
 function SideBar({ states, curves }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
-  console.log(states);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
-  console.log(stateOptions);
   const [selectedState, setSelectedState] = useState<Options | null>(null);
+  // const [symbols, setSymbols] = useState([""]); //needed later to edit symbols
 
   //find curves that start on the state that the user has selected using the ui
   const filterCurves = () => {
@@ -44,11 +45,16 @@ function SideBar({ states, curves }: SideBarProps) {
     const selectedCurves = curves.filter(
       (e) => e.start === selectedState.value,
     );
+    // we do this so that new states print that there are no transitions
+    if (selectedCurves.length === 0) return null;
     return selectedCurves;
   };
 
-  const selectedCurves = filterCurves();
+  const filteredCurves = filterCurves();
+  //just realized i need another useState to select an specific filtered curves
+  const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
 
+  // TODO: Add settings tab but that can probably wait after the presentation
   return (
     <div className="flex flex-col w-[20vw] border-r-1 border-black/50 dark:border-white/50 dark:bg-black dark:text-white">
       <div className="w-full mr-auto ml-auto p-2 border-b border-black/50 dark:border-white/50">
@@ -61,7 +67,6 @@ function SideBar({ states, curves }: SideBarProps) {
           </button>
         </div>
       </div>
-      {/* We need to add some logic to when we chose the settings tab*/}
       <div className="w-full mr-auto ml-auto p-2">
         <div className="flex gap-1 w-full">
           <p className="flex-1 truncate text-xl text-center rounded-full font-medium py-1">
@@ -70,7 +75,10 @@ function SideBar({ states, curves }: SideBarProps) {
           {/* Select */}
           <Select
             value={selectedState}
-            onChange={setSelectedState}
+            onChange={(e) => {
+              setSelectedState(e);
+              setSelectedCurve(null);
+            }}
             options={stateOptions}
             styles={{
               control: (baseStyles, state) => ({
@@ -138,16 +146,47 @@ function SideBar({ states, curves }: SideBarProps) {
             True
           </button>
         </div>
+        {/* Transitions */}
         <div>
-          <p className="text-center text-xl font-medium p-1">Transitions.</p>
-          <div className="h-[25vh] overflow-y-auto border border-black/50 dark:border-white/50 rounded-md">
-            {selectedCurves ? (
-              selectedCurves.map((o) => (
+          <p className="text-center text-xl font-medium p-1">
+            Transition functions.
+          </p>
+          <div className="h-[22vh] overflow-y-auto border border-black/50 dark:border-white/50 rounded-md">
+            {filteredCurves ? (
+              filteredCurves.map((o) => (
                 <div
                   key={o.id}
-                  className="text-center p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 cursor-pointer"
+                  className={`text-center p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 cursor-pointer
+                    ${
+                      selectedCurve?.id === o.id
+                        ? "bg-gray-100 dark:bg-zinc-900 font-medium text-pink-500"
+                        : ""
+                    }
+                  `}
+                  onClick={() => setSelectedCurve(o)}
                 >
                   {o.name}
+                </div>
+              ))
+            ) : (
+              <p className="text-center p-2">No Transitions found.</p>
+            )}
+          </div>
+        </div>
+        {/* Symbols */}
+        <div>
+          <p className="text-center text-xl font-medium p-1">
+            Transition Symbols.
+          </p>
+          <div className="h-[22vh] overflow-y-auto border border-black/50 dark:border-white/50 rounded-md">
+            {selectedCurve ? (
+              selectedCurve.symbol.map((o) => (
+                <div
+                  key={o}
+                  className="text-center p-2 text-center hover:bg-gray-100 dark:hover:bg-zinc-900 flex items-center justify-between gap-2"
+                >
+                  <p className="ml-auto">{o}</p>
+                  <FaEdit className="cursor-pointer ml-auto" />
                 </div>
               ))
             ) : (
