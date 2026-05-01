@@ -1,5 +1,6 @@
 import Select from "react-select";
 import useTheme from "../hooks/useTheme";
+import { useState } from "react";
 //Este sidebar te permitira conectar estados, seleccionar simbolos de transicion
 //Hacer que los estados sean terminales entre otras cosas
 
@@ -25,11 +26,28 @@ type SideBarProps = {
   curves: CurveType[];
 };
 
+type Options = {
+  value: string;
+  label: string;
+};
+
 function SideBar({ states, curves }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   console.log(states);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
   console.log(stateOptions);
+  const [selectedState, setSelectedState] = useState<Options | null>(null);
+
+  //find curves that start on the state that the user has selected using the ui
+  const filterCurves = () => {
+    if (!selectedState) return;
+    const selectedCurves = curves.filter(
+      (e) => e.start === selectedState.value,
+    );
+    return selectedCurves;
+  };
+
+  const selectedCurves = filterCurves();
 
   return (
     <div className="flex flex-col w-[20vw] border-r-1 border-black/50 dark:border-white/50 dark:bg-black dark:text-white">
@@ -49,7 +67,10 @@ function SideBar({ states, curves }: SideBarProps) {
           <p className="flex-1 truncate text-xl text-center rounded-full font-medium py-1">
             Current State.
           </p>
+          {/* Select */}
           <Select
+            value={selectedState}
+            onChange={setSelectedState}
             options={stateOptions}
             styles={{
               control: (baseStyles, state) => ({
@@ -116,6 +137,23 @@ function SideBar({ states, curves }: SideBarProps) {
           <button className="w-[5vw] font-[JetBrains_Mono] truncate text-xl border border-black/50 rounded-full py-1 dark:border-white/50">
             True
           </button>
+        </div>
+        <div>
+          <p className="text-center text-xl font-medium p-1">Transitions.</p>
+          <div className="h-[25vh] overflow-y-auto border border-black/50 dark:border-white/50 rounded-md">
+            {selectedCurves ? (
+              selectedCurves.map((o) => (
+                <div
+                  key={o.id}
+                  className="text-center p-2 hover:bg-gray-100 dark:hover:bg-zinc-900 cursor-pointer"
+                >
+                  {o.name}
+                </div>
+              ))
+            ) : (
+              <p className="text-center p-2">No Transitions found.</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
