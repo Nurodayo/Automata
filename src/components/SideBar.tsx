@@ -34,6 +34,7 @@ type SideBarProps = {
   setClickedStateId: (id: string | null) => void;
   selectedCurve: CurveType | null;
   setSelectedCurve: (curve: CurveType | null) => void;
+  selectState: (id: string) => void;
 };
 
 // type Options = {
@@ -50,13 +51,20 @@ function SideBar({
   setClickedStateId,
   selectedCurve,
   setSelectedCurve,
+  selectState,
 }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
-  const selectedOption =
-    stateOptions.find((opt) => opt.value === clickedStateId) || null;
-  // const [symbols, setSymbols] = useState([""]); //needed later to edit symbols
+  // i wanted to use quicksort again but it was to hard so i gave up
+  const sortedOptions = [...stateOptions]
+    .sort((a, b) => Number(a.label.slice(1)) - Number(b.label.slice(1)))
+    .map((s) => ({
+      value: s.value,
+      label: `q${Number(s.label.slice(1))}`,
+    }));
 
+  const selectedOption =
+    sortedOptions.find((opt) => opt.value === clickedStateId) || null;
   //find curves that start on the state that the user has selected using the ui
   const filterCurves = () => {
     if (!clickedStateId) return;
@@ -97,8 +105,9 @@ function SideBar({
             value={selectedOption}
             onChange={(e) => {
               setClickedStateId(e?.value ?? null);
+              selectState(e?.value ?? "");
             }}
-            options={stateOptions}
+            options={sortedOptions}
             styles={{
               control: (baseStyles, state) => ({
                 ...baseStyles,
@@ -154,7 +163,7 @@ function SideBar({
               }),
             }}
             menuPlacement="auto"
-            maxMenuHeight={150}
+            maxMenuHeight={300}
           />
         </div>
         <div className="flex gap-1 w-full py-2">

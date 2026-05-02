@@ -195,13 +195,13 @@ const Canvas = () => {
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
   const selectState = (id: string) => {
+    setClickedState(id);
     setStates((prev) =>
       prev.map((state) => ({
         ...state,
         isSelected: state.id === id,
       })),
     );
-    setClickedState(id);
   };
   // Deselect when clicking the canvas
   const clearSelection = () => {
@@ -217,11 +217,13 @@ const Canvas = () => {
       prev.map((state) => (state.id === id ? { ...state, x, y } : state)),
     );
   };
-
+  // fixed centering
   const goToCenter = (e: Konva.Stage | null) => {
     if (!e) return;
-    e.x(0 - width / 2);
-    e.y(0 - height / 2);
+    e.scaleX(1);
+    e.scaleY(1);
+    e.x(0 + width / 2);
+    e.y(0 + height / 2);
 
     setPosition({ x: 0, y: 0 });
     console.log(position);
@@ -276,6 +278,7 @@ const Canvas = () => {
         setClickedStateId={setClickedState}
         selectedCurve={selectedCurve}
         setSelectedCurve={setSelectedCurve}
+        selectState={selectState}
       />
       {/* height / 16 is to account for the navbar*/}
       <Stage
