@@ -1,6 +1,6 @@
 import Select from "react-select";
 import useTheme from "../hooks/useTheme";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
@@ -35,6 +35,7 @@ type SideBarProps = {
   selectedCurve: CurveType | null;
   setSelectedCurve: (curve: CurveType | null) => void;
   selectState: (id: string) => void;
+  createCurve: (end: string | null) => void;
 };
 
 // type Options = {
@@ -52,6 +53,7 @@ function SideBar({
   selectedCurve,
   setSelectedCurve,
   selectState,
+  createCurve,
 }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
@@ -63,6 +65,8 @@ function SideBar({
       label: `q${Number(s.label.slice(1))}`,
     }));
 
+  const [endState, setEndState] = useState<string | null>(null);
+
   const selectedOption =
     sortedOptions.find((opt) => opt.value === clickedStateId) || null;
   //find curves that start on the state that the user has selected using the ui
@@ -73,6 +77,8 @@ function SideBar({
     if (selectedCurves.length === 0) return null;
     return selectedCurves;
   };
+
+  const selectStyle = (t) => {return();}
 
   const filteredCurves = filterCurves();
   //just realized i need another useState to select an specific filtered curves
@@ -211,7 +217,10 @@ function SideBar({
           {/* Create states buttons */}
           <div className="p-1">
             <div className="flex gap-1 w-full">
-              <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+              <button
+                onClick={() => createCurve(endState)}
+                className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50"
+              >
                 <FaPlus className="m-auto" />
               </button>
               <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">

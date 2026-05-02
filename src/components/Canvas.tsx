@@ -212,6 +212,28 @@ const Canvas = () => {
       })),
     );
   };
+  // Creating new curves
+  // We will use the start as the current selected state
+  const createCurve = (end: string | null) => {
+    if (!clickedState) return;
+    if (!end) return;
+    const newId = crypto.randomUUID();
+    // these calculations will make it easier to export a json with transition functions later
+    const startName = states.find((s) => s.id === clickedState) ?? "???";
+    const endName = states.find((s) => s.id === end) ?? "???";
+    const newCurve: CurveType = {
+      id: newId,
+      name: `${startName} to ${endName}`,
+      start: clickedState,
+      end: end,
+      symbol: [],
+    };
+
+    const newCurves = curves;
+    newCurves.push(newCurve);
+    setCurves(newCurves);
+  };
+
   const updatePosition = (id: string, x: number, y: number) => {
     setStates((prev) =>
       prev.map((state) => (state.id === id ? { ...state, x, y } : state)),
@@ -279,6 +301,7 @@ const Canvas = () => {
         selectedCurve={selectedCurve}
         setSelectedCurve={setSelectedCurve}
         selectState={selectState}
+        createCurve={createCurve}
       />
       {/* height / 16 is to account for the navbar*/}
       <Stage
