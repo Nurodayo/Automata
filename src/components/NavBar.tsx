@@ -15,14 +15,14 @@ function NavBar() {
         <p className="font-bold text-3xl">Nurin Automata</p>{" "}
         <div className="ml-auto flex flex-row">
           <button
-            className="pr-2  hover:scale-120 hover:text-pink-500 duration-300"
+            className="pr-2  hover:scale-120 hover:text-pink-500 duration-300 cursor-pointer"
             onClick={toggle}
           >
             {theme ? <FaMoon size={28} /> : <FaSun size={28} />}
           </button>
           {/*Animacion bonita jujujuj*/}
           <a
-            className="transition transform easy-in duration-300 hover:scale-120 hover:text-pink-500"
+            className="transition transform easy-in duration-300 hover:scale-120 hover:text-pink-500 cursor-pointer"
             target="_blank"
             href="https://github.com/Nurodayo/Automata"
             rel="noopener noreferrer"
