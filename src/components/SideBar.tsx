@@ -1,11 +1,15 @@
 import Select from "react-select";
 import useTheme from "../hooks/useTheme";
-import { useState } from "react";
+import { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
+import { FaMinus } from "react-icons/fa";
 //Este sidebar te permitira conectar estados, seleccionar simbolos de transicion
 //Hacer que los estados sean terminales entre otras cosas
 
 // This is all about transitioning !!! 🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️
+// i didn't knew how many times i would've had to define type
+//
 type StateType = {
   id: string;
   name: string;
@@ -26,25 +30,37 @@ type CurveType = {
 type SideBarProps = {
   states: StateType[];
   curves: CurveType[];
+  clickedStateId: string | null;
+  setClickedStateId: (id: string | null) => void;
+  selectedCurve: CurveType | null;
+  setSelectedCurve: (curve: CurveType | null) => void;
 };
 
-type Options = {
-  value: string;
-  label: string;
-};
+// type Options = {
+//   value: string;
+//   label: string;
+// };
 
-function SideBar({ states, curves }: SideBarProps) {
+// we pass an useState() (the constant and the setter so the select can update when you click the canvas)
+// if i dont do this now i'll tell you, we will do the same for symbols but i have to make the renaming ui
+function SideBar({
+  states,
+  curves,
+  clickedStateId,
+  setClickedStateId,
+  selectedCurve,
+  setSelectedCurve,
+}: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
-  const [selectedState, setSelectedState] = useState<Options | null>(null);
+  const selectedOption =
+    stateOptions.find((opt) => opt.value === clickedStateId) || null;
   // const [symbols, setSymbols] = useState([""]); //needed later to edit symbols
 
   //find curves that start on the state that the user has selected using the ui
   const filterCurves = () => {
-    if (!selectedState) return;
-    const selectedCurves = curves.filter(
-      (e) => e.start === selectedState.value,
-    );
+    if (!clickedStateId) return;
+    const selectedCurves = curves.filter((e) => e.start === clickedStateId);
     // we do this so that new states print that there are no transitions
     if (selectedCurves.length === 0) return null;
     return selectedCurves;
@@ -52,7 +68,11 @@ function SideBar({ states, curves }: SideBarProps) {
 
   const filteredCurves = filterCurves();
   //just realized i need another useState to select an specific filtered curves
-  const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
+  // const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
+  // complains about infinite rerenders but it works fine
+  useEffect(() => {
+    setSelectedCurve(null);
+  }, [clickedStateId]);
 
   // TODO: Add settings tab but that can probably wait after the presentation
   return (
@@ -74,10 +94,9 @@ function SideBar({ states, curves }: SideBarProps) {
           </p>
           {/* Select */}
           <Select
-            value={selectedState}
+            value={selectedOption}
             onChange={(e) => {
-              setSelectedState(e);
-              setSelectedCurve(null);
+              setClickedStateId(e?.value ?? null);
             }}
             options={stateOptions}
             styles={{
@@ -165,12 +184,31 @@ function SideBar({ states, curves }: SideBarProps) {
                   `}
                   onClick={() => setSelectedCurve(o)}
                 >
-                  {o.name}
+                  {/*Surely using an ascii arrow wont introduce problems later on. Right?*/}
+                  {/*if i did this in js instead of ts i would've been done with this long ago but i chose pain*/}
+                  {states ? (
+                    `${states.find((s: StateType) => s.id === o.start)?.name ?? "?"} → ${states.find((s: StateType) => s.id === o.end)?.name ?? "?"}`
+                  ) : (
+                    <p className="text-red-500">
+                      No states associated to this transition.
+                    </p>
+                  )}
                 </div>
               ))
             ) : (
               <p className="text-center p-2">No Transitions found.</p>
             )}
+          </div>
+          {/* Create states buttons */}
+          <div className="p-1">
+            <div className="flex gap-1 w-full">
+              <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+                <FaPlus className="m-auto" />
+              </button>
+              <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+                <FaMinus className="m-auto" />
+              </button>
+            </div>
           </div>
         </div>
         {/* Symbols */}
@@ -190,8 +228,19 @@ function SideBar({ states, curves }: SideBarProps) {
                 </div>
               ))
             ) : (
-              <p className="text-center p-2">No Transitions found.</p>
+              <p className="text-center p-2">No Transitions Selected.</p>
             )}
+          </div>
+        </div>
+        {/* Add symbols button */}
+        <div className="p-1">
+          <div className="flex gap-1 w-full">
+            <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+              <FaPlus className="m-auto" />
+            </button>
+            <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+              <FaMinus className="m-auto" />
+            </button>
           </div>
         </div>
       </div>
