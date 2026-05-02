@@ -8,6 +8,15 @@ import Konva from "konva";
 import RightClickMenu from "./RightClickMenu";
 import SideBar from "./SideBar";
 import useTheme from "../hooks/useTheme";
+// i should make a ts file with the types
+
+type CurveType = {
+  id: string;
+  name: string;
+  start: string;
+  end: string;
+  symbol: string[];
+};
 
 const Canvas = () => {
   const theme = useTheme((e) => e.bool);
@@ -66,12 +75,66 @@ const Canvas = () => {
   ]);
 
   // Creating new states
+  // i would like it so states are named automatically so i dont have to make a renaming ui
   const createStates = () => {
     clearSelection();
     const prev = states;
     const newId: string = crypto.randomUUID();
 
-    const name = "q".concat(prev.length.toString());
+    const name = (() => {
+      const names = states.map((e) => Number(e.name.slice(1)));
+      // we will sort the array and then find the mising number to name the new state
+      // we need to sort because the new state will always be appended to the end
+      // ex names = [1, 2, 3] we see that 4 is missing and create q4
+      // ex if a state was deleted names = [1, 2, 4] we find that 3 is missing and create q3
+      // quicksort from https://www.geeksforgeeks.org/dsa/iterative-quick-sort/
+      const partition = (arr: number[], low: number, high: number) => {
+        let temp: number;
+        const pivot = arr[high];
+
+        let i = low - 1;
+        for (let j = low; j <= high - 1; j++) {
+          if (arr[j] <= pivot) {
+            i++;
+
+            temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+          }
+        }
+        temp = arr[i + 1];
+        arr[i + 1] = arr[high];
+        arr[high] = temp;
+
+        return i + 1;
+      };
+
+      function qSort(arr: number[], low: number, high: number) {
+        if (low < high) {
+          /* pi is partitioning index, 
+            arr[pi] is now at right place */
+          const pi = partition(arr, low, high);
+
+          // Recursively sort elements
+          // before partition and after
+          // partition
+          qSort(arr, low, pi - 1);
+          qSort(arr, pi + 1, high);
+        }
+      }
+
+      const length = names.length;
+      qSort(names, 0, length - 1);
+
+      for (let i = 0; i <= length; i++) {
+        // console.log(i);
+        if (i !== names[i]) {
+          return "q".concat(String(i));
+        }
+      }
+    })();
+
+    if (!name) return;
     // Done
     const newState = {
       id: newId,
@@ -89,7 +152,7 @@ const Canvas = () => {
   // curva bezier entre los dos estados basada en las funciones de transicion
   // bezier curve between both states bases on transition functions (or however the hell they're called in english)
   // no sera la forma mas optimizada para hacer esto pero es muy parecido a la teoria
-  const [curves] = useState([
+  const [curves, setCurves] = useState([
     {
       id: "curve0",
       name: "curve0",
@@ -105,8 +168,29 @@ const Canvas = () => {
       symbol: ["0"],
     },
   ]);
+
+  // When we delete a state we also need to delete al transitions containing that state
+  const deleteState = () => {
+    //delete curves
+    const filteredCurves: CurveType[] = curves.filter(
+      (c) => c.start !== clickedState && c.end !== clickedState,
+    );
+    setCurves(filteredCurves);
+
+    //delete state
+
+    const filteredStates = states.filter((s) => s.id !== clickedState);
+
+    setStates(filteredStates);
+  };
+
   // Last id of the last clicked state
+  //
+  // SideBar Props
+  //
   const [clickedState, setClickedState] = useState<string | null>(null);
+  const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
+  //
   //const stageRef = useRef(null); // does not seem to be necesary
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
@@ -179,7 +263,7 @@ const Canvas = () => {
       label: "Center Camera.",
       method: () => goToCenter(stageRef.current),
     },
-    { id: "2", label: "Delete State.", method: () => console.log("Deleted") },
+    { id: "2", label: "Delete State.", method: deleteState },
   ];
 
   // We're going to calculate the grid Once
@@ -190,6 +274,8 @@ const Canvas = () => {
         curves={curves}
         clickedStateId={clickedState}
         setClickedStateId={setClickedState}
+        selectedCurve={selectedCurve}
+        setSelectedCurve={setSelectedCurve}
       />
       {/* height / 16 is to account for the navbar*/}
       <Stage

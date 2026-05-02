@@ -1,6 +1,6 @@
 import Select from "react-select";
 import useTheme from "../hooks/useTheme";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
@@ -8,6 +8,8 @@ import { FaMinus } from "react-icons/fa";
 //Hacer que los estados sean terminales entre otras cosas
 
 // This is all about transitioning !!! 🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️🏳️‍⚧️
+// i didn't knew how many times i would've had to define type
+//
 type StateType = {
   id: string;
   name: string;
@@ -30,6 +32,8 @@ type SideBarProps = {
   curves: CurveType[];
   clickedStateId: string | null;
   setClickedStateId: (id: string | null) => void;
+  selectedCurve: CurveType | null;
+  setSelectedCurve: (curve: CurveType | null) => void;
 };
 
 // type Options = {
@@ -38,11 +42,14 @@ type SideBarProps = {
 // };
 
 // we pass an useState() (the constant and the setter so the select can update when you click the canvas)
+// if i dont do this now i'll tell you, we will do the same for symbols but i have to make the renaming ui
 function SideBar({
   states,
   curves,
   clickedStateId,
   setClickedStateId,
+  selectedCurve,
+  setSelectedCurve,
 }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
@@ -61,7 +68,7 @@ function SideBar({
 
   const filteredCurves = filterCurves();
   //just realized i need another useState to select an specific filtered curves
-  const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
+  // const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
   // complains about infinite rerenders but it works fine
   useEffect(() => {
     setSelectedCurve(null);
