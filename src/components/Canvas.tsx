@@ -147,6 +147,8 @@ const Canvas = () => {
     const newArray = [...prev];
     newArray.push(newState);
     setStates(newArray);
+
+    setClickedState(newId);
   };
 
   // curva bezier entre los dos estados basada en las funciones de transicion
@@ -229,7 +231,7 @@ const Canvas = () => {
       symbol: [],
     };
 
-    const newCurves = curves;
+    const newCurves = [...curves, newCurve];
     newCurves.push(newCurve);
     setCurves(newCurves);
   };

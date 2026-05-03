@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
 //Este sidebar te permitira conectar estados, seleccionar simbolos de transicion
 //Hacer que los estados sean terminales entre otras cosas
 
@@ -71,6 +72,7 @@ function SideBar({
 
   const selectedOption =
     sortedOptions.find((opt) => opt.value === clickedStateId) || null;
+
   //find curves that start on the state that the user has selected using the ui
   const filterCurves = () => {
     if (!clickedStateId) return;
@@ -155,9 +157,56 @@ function SideBar({
       instead of transitionMenu*/}
       {stateMenu && (
         <div className="flex items-center justify-center z-20 w-[100vw] h-[94vh] bg-black/50 absolute backdrop-blur-xs">
-          <div className="w-[33vw] h-[33vh] bg-white rounded-md border-1 border-black dark:bg-black dark:border-white/50">
-            <Select styles={selectStyle(theme)} options={sortedOptions} />
+          <div className="w-[33vw] h-[33vh] bg-white rounded-md border-1 border-black dark:bg-black dark:border-white/50 z-30">
+            <div className="flex w-[33vw] flex-col items-center p-2 h-full">
+              <button
+                className="ml-auto px-2 hover:scale-120 hover:text-pink-500 duration-300 cursor-pointer"
+                onClick={() => {
+                  setStateMenu(false);
+                }}
+              >
+                <MdCancel size={28} />
+              </button>
+              <div className="px-2 flex flex-row items-center">
+                <p className="text-xl">Select ending state.</p>
+                <Select
+                  onChange={(e) => {
+                    setEndState(e?.value ?? null);
+                  }}
+                  className="pl-2 w-[5vw]"
+                  styles={selectStyle(theme)}
+                  options={sortedOptions}
+                  menuPlacement="auto"
+                  maxMenuHeight={240}
+                />
+              </div>
+              <div className="p-2 mt-auto">
+                {endState ? (
+                  <button
+                    onClick={() => {
+                      createCurve(endState);
+                      setEndState(null);
+                      setStateMenu(false);
+                    }}
+                    className="text-xl cursor-pointer truncate border border-black/50 rounded-md py-1 dark:border-white/50 hover:bg-gray-100 hover:border-pink-500
+                    hover:text-pink-500  duration-200 ease-in-out dark:hover:bg-zinc-900"
+                  >
+                    <p className="px-2">Create Transition.</p>
+                  </button>
+                ) : (
+                  <button className="text-xl truncate border border-gray-400 rounded-md py-1 dark:border-zinc-700 text-gray-400 dark:text-zinc-700">
+                    <p className="px-2">Create Transition.</p>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
+          <div
+            onClick={() => {
+              setStateMenu(false);
+            }}
+            className="flex items-center justify-center z-20 w-[100vw] h-[94vh] absolute"
+          />
         </div>
       )}
       <div className="w-full mr-auto ml-auto p-2 border-b border-black/50 dark:border-white/50">
