@@ -1,9 +1,11 @@
 import Select from "react-select";
+import type { StylesConfig } from "react-select";
 import useTheme from "../hooks/useTheme";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
 //Este sidebar te permitira conectar estados, seleccionar simbolos de transicion
 //Hacer que los estados sean terminales entre otras cosas
 
@@ -34,12 +36,14 @@ type SideBarProps = {
   setClickedStateId: (id: string | null) => void;
   selectedCurve: CurveType | null;
   setSelectedCurve: (curve: CurveType | null) => void;
+  selectState: (id: string) => void;
+  createCurve: (end: string | null) => void;
 };
 
-// type Options = {
-//   value: string;
-//   label: string;
-// };
+type Options = {
+  value: string;
+  label: string;
+};
 
 // we pass an useState() (the constant and the setter so the select can update when you click the canvas)
 // if i dont do this now i'll tell you, we will do the same for symbols but i have to make the renaming ui
@@ -50,12 +54,24 @@ function SideBar({
   setClickedStateId,
   selectedCurve,
   setSelectedCurve,
+  selectState,
+  createCurve,
 }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
+  // i wanted to use quicksort again but it was to hard so i gave up
+  const sortedOptions = [...stateOptions]
+    .sort((a, b) => Number(a.label.slice(1)) - Number(b.label.slice(1)))
+    .map((s) => ({
+      value: s.value,
+      label: `q${Number(s.label.slice(1))}`,
+    }));
+  // we will open the menu, select a state using the select and execute the createCurve()
+  const [stateMenu, setStateMenu] = useState(false);
+  const [endState, setEndState] = useState<string | null>(null);
+
   const selectedOption =
-    stateOptions.find((opt) => opt.value === clickedStateId) || null;
-  // const [symbols, setSymbols] = useState([""]); //needed later to edit symbols
+    sortedOptions.find((opt) => opt.value === clickedStateId) || null;
 
   //find curves that start on the state that the user has selected using the ui
   const filterCurves = () => {
@@ -64,6 +80,66 @@ function SideBar({
     // we do this so that new states print that there are no transitions
     if (selectedCurves.length === 0) return null;
     return selectedCurves;
+  };
+
+  const selectStyle = (t: boolean): StylesConfig<Options, false> => {
+    return (
+      //hopefully this works
+      {
+        control: (baseStyles, state) => ({
+          ...baseStyles,
+          backgroundColor: "transparent",
+          borderColor: state.isFocused
+            ? "deeppink"
+            : t
+              ? "#00000080"
+              : "#ffffff80",
+          width: "5vw",
+          boxShadow: "none",
+          "&:hover": {
+            borderColor: state.isFocused
+              ? "deeppink"
+              : t
+                ? "#00000080"
+                : "#ffffff80",
+          },
+        }),
+
+        menu: (baseStyles) => ({
+          ...baseStyles,
+          backgroundColor: t ? "white" : "black",
+          color: t ? "black" : "white",
+          borderStyle: "solid",
+          borderWidth: 1,
+          borderColor: t ? "#00000080" : "#ffffff80",
+        }),
+
+        option: (baseStyles, state) => ({
+          ...baseStyles,
+          backgroundColor: t
+            ? state.isFocused
+              ? "#F3F4F6"
+              : "white"
+            : state.isFocused
+              ? "#18181B"
+              : "black", //Same colors as in tailwind
+          color: state.isFocused ? "deeppink" : t ? "black" : "white",
+          textAlign: "center",
+        }),
+
+        singleValue: (baseStyles) => ({
+          ...baseStyles,
+          color: t ? "black" : "white",
+          textAlign: "center",
+        }),
+
+        placeholder: (baseStyles) => ({
+          ...baseStyles,
+          color: t ? "#00000080" : "#ffffff80",
+          textAlign: "center",
+        }),
+      }
+    );
   };
 
   const filteredCurves = filterCurves();
@@ -77,6 +153,62 @@ function SideBar({
   // TODO: Add settings tab but that can probably wait after the presentation
   return (
     <div className="flex flex-col w-[20vw] border-r-1 border-black/50 dark:border-white/50 dark:bg-black dark:text-white">
+      {/* The create transition menu i've been working on this and just realized i called this stateMenu for some reason
+      instead of transitionMenu*/}
+      {stateMenu && (
+        <div className="flex items-center justify-center z-20 w-[100vw] h-[94vh] bg-black/50 absolute backdrop-blur-xs">
+          <div className="w-[33vw] h-[33vh] bg-white rounded-md border-1 border-black dark:bg-black dark:border-white/50 z-30">
+            <div className="flex w-[33vw] flex-col items-center p-2 h-full">
+              <button
+                className="ml-auto px-2 hover:scale-120 hover:text-pink-500 duration-300 cursor-pointer"
+                onClick={() => {
+                  setStateMenu(false);
+                }}
+              >
+                <MdCancel size={28} />
+              </button>
+              <div className="px-2 flex flex-row items-center">
+                <p className="text-xl">Select ending state.</p>
+                <Select
+                  onChange={(e) => {
+                    setEndState(e?.value ?? null);
+                  }}
+                  className="pl-2 w-[5vw]"
+                  styles={selectStyle(theme)}
+                  options={sortedOptions}
+                  menuPlacement="auto"
+                  maxMenuHeight={240}
+                />
+              </div>
+              <div className="p-2 mt-auto">
+                {endState ? (
+                  <button
+                    onClick={() => {
+                      createCurve(endState);
+                      setEndState(null);
+                      setStateMenu(false);
+                    }}
+                    className="text-xl cursor-pointer truncate border border-black/50 rounded-md py-1 dark:border-white/50 hover:bg-gray-100 hover:border-pink-500
+                    hover:text-pink-500  duration-200 ease-in-out dark:hover:bg-zinc-900"
+                  >
+                    <p className="px-2">Create Transition.</p>
+                  </button>
+                ) : (
+                  <button className="text-xl truncate border border-gray-400 rounded-md py-1 dark:border-zinc-700 text-gray-400 dark:text-zinc-700">
+                    <p className="px-2">Create Transition.</p>
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+          <div
+            onClick={() => {
+              setStateMenu(false);
+            }}
+            className="flex items-center justify-center z-20 w-[100vw] h-[94vh] absolute"
+          />
+        </div>
+      )}
       <div className="w-full mr-auto ml-auto p-2 border-b border-black/50 dark:border-white/50">
         <div className="flex gap-1 w-full">
           <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
@@ -97,64 +229,12 @@ function SideBar({
             value={selectedOption}
             onChange={(e) => {
               setClickedStateId(e?.value ?? null);
+              selectState(e?.value ?? "");
             }}
-            options={stateOptions}
-            styles={{
-              control: (baseStyles, state) => ({
-                ...baseStyles,
-                backgroundColor: "transparent",
-                borderColor: state.isFocused
-                  ? "deeppink"
-                  : theme
-                    ? "#00000080"
-                    : "#ffffff80",
-                width: "5vw",
-                boxShadow: "none",
-                "&:hover": {
-                  borderColor: state.isFocused
-                    ? "deeppink"
-                    : theme
-                      ? "#00000080"
-                      : "#ffffff80",
-                },
-              }),
-
-              menu: (baseStyles) => ({
-                ...baseStyles,
-                backgroundColor: theme ? "white" : "black",
-                color: theme ? "black" : "white",
-                borderStyle: "solid",
-                borderWidth: 1,
-                borderColor: theme ? "#00000080" : "#ffffff80",
-              }),
-
-              option: (baseStyles, state) => ({
-                ...baseStyles,
-                backgroundColor: theme
-                  ? state.isFocused
-                    ? "#F3F4F6"
-                    : "white"
-                  : state.isFocused
-                    ? "#18181B"
-                    : "black", //Same colors as in tailwind
-                color: state.isFocused ? "deeppink" : theme ? "black" : "white",
-                textAlign: "center",
-              }),
-
-              singleValue: (baseStyles) => ({
-                ...baseStyles,
-                color: theme ? "black" : "white",
-                textAlign: "center",
-              }),
-
-              placeholder: (baseStyles) => ({
-                ...baseStyles,
-                color: theme ? "#00000080" : "#ffffff80",
-                textAlign: "center",
-              }),
-            }}
+            options={sortedOptions}
+            styles={selectStyle(theme)}
             menuPlacement="auto"
-            maxMenuHeight={150}
+            maxMenuHeight={300}
           />
         </div>
         <div className="flex gap-1 w-full py-2">
@@ -202,10 +282,13 @@ function SideBar({
           {/* Create states buttons */}
           <div className="p-1">
             <div className="flex gap-1 w-full">
-              <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+              <button
+                onClick={() => setStateMenu(true)}
+                className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer"
+              >
                 <FaPlus className="m-auto" />
               </button>
-              <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+              <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer">
                 <FaMinus className="m-auto" />
               </button>
             </div>
@@ -235,10 +318,10 @@ function SideBar({
         {/* Add symbols button */}
         <div className="p-1">
           <div className="flex gap-1 w-full">
-            <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+            <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer">
               <FaPlus className="m-auto" />
             </button>
-            <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
+            <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer">
               <FaMinus className="m-auto" />
             </button>
           </div>

@@ -147,6 +147,8 @@ const Canvas = () => {
     const newArray = [...prev];
     newArray.push(newState);
     setStates(newArray);
+
+    setClickedState(newId);
   };
 
   // curva bezier entre los dos estados basada en las funciones de transicion
@@ -195,13 +197,13 @@ const Canvas = () => {
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
   const selectState = (id: string) => {
+    setClickedState(id);
     setStates((prev) =>
       prev.map((state) => ({
         ...state,
         isSelected: state.id === id,
       })),
     );
-    setClickedState(id);
   };
   // Deselect when clicking the canvas
   const clearSelection = () => {
@@ -212,16 +214,40 @@ const Canvas = () => {
       })),
     );
   };
+  // Creating new curves
+  // We will use the start as the current selected state
+  const createCurve = (end: string | null) => {
+    if (!clickedState) return;
+    if (!end) return;
+    const newId = crypto.randomUUID();
+    // these calculations will make it easier to export a json with transition functions later
+    const startName = states.find((s) => s.id === clickedState) ?? "???";
+    const endName = states.find((s) => s.id === end) ?? "???";
+    const newCurve: CurveType = {
+      id: newId,
+      name: `${startName} to ${endName}`,
+      start: clickedState,
+      end: end,
+      symbol: [],
+    };
+
+    const newCurves = [...curves, newCurve];
+    newCurves.push(newCurve);
+    setCurves(newCurves);
+  };
+
   const updatePosition = (id: string, x: number, y: number) => {
     setStates((prev) =>
       prev.map((state) => (state.id === id ? { ...state, x, y } : state)),
     );
   };
-
+  // fixed centering
   const goToCenter = (e: Konva.Stage | null) => {
     if (!e) return;
-    e.x(0 - width / 2);
-    e.y(0 - height / 2);
+    e.scaleX(1);
+    e.scaleY(1);
+    e.x(0 + width / 2);
+    e.y(0 + height / 2);
 
     setPosition({ x: 0, y: 0 });
     console.log(position);
@@ -276,6 +302,8 @@ const Canvas = () => {
         setClickedStateId={setClickedState}
         selectedCurve={selectedCurve}
         setSelectedCurve={setSelectedCurve}
+        selectState={selectState}
+        createCurve={createCurve}
       />
       {/* height / 16 is to account for the navbar*/}
       <Stage
