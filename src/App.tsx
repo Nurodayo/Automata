@@ -1,7 +1,9 @@
 // import "./App.css";
 import Konva from "konva";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Canvas from "./components/Canvas.tsx";
 import NavBar from "./components/NavBar.tsx";
+import Landing from "./components/Landing.tsx";
 import { useEffect } from "react";
 import useTheme from "./hooks/useTheme.tsx";
 import "./index.css";
@@ -19,12 +21,15 @@ function App() {
   }, [theme]);
 
   return (
-    <div className="flex flex-col h-full">
-      <NavBar />
-      <div className="flex flex-row">
-        <Canvas />
+    <BrowserRouter>
+      <div className="flex flex-col h-full">
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/canvas" element={<Canvas />} />
+        </Routes>
       </div>
-    </div>
+    </BrowserRouter>
   );
 }
 export default App;
