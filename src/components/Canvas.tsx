@@ -232,7 +232,6 @@ const Canvas = () => {
     };
 
     const newCurves = [...curves, newCurve];
-    newCurves.push(newCurve);
     setCurves(newCurves);
   };
 
