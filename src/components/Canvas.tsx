@@ -9,14 +9,9 @@ import RightClickMenu from "./RightClickMenu";
 import SideBar from "./SideBar";
 import useTheme from "../hooks/useTheme";
 // i should make a ts file with the types
-
-type CurveType = {
-  id: string;
-  name: string;
-  start: string;
-  end: string;
-  symbol: string[];
-};
+// i did it
+import type { CurveType } from "../types";
+import type { StateType } from "../types";
 
 const Canvas = () => {
   const theme = useTheme((e) => e.bool);
@@ -70,19 +65,19 @@ const Canvas = () => {
   //   console.log(position);
   // }, [position]);
   const [states, setStates] = useState([
-    { id: "0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
-    { id: "1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
+    { id: "q0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
+    { id: "q1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
   ]);
 
   // Creating new states
   // i would like it so states are named automatically so i dont have to make a renaming ui
   const createStates = () => {
     clearSelection();
-    const prev = states;
-    const newId: string = crypto.randomUUID();
+    const prev: StateType[] = states;
+    // const newId: string = crypto.randomUUID();
+    const names = states.map((e) => Number(e.name.slice(1)));
 
     const name = (() => {
-      const names = states.map((e) => Number(e.name.slice(1)));
       // we will sort the array and then find the mising number to name the new state
       // we need to sort because the new state will always be appended to the end
       // ex names = [1, 2, 3] we see that 4 is missing and create q4
@@ -114,6 +109,7 @@ const Canvas = () => {
         // console.log(`${i} names ${names[i]}`);
         if (i !== names[i]) {
           // console.log(names[i]);
+          names.push(i);
           return "q".concat(String(i));
         }
       }
@@ -123,19 +119,26 @@ const Canvas = () => {
 
     if (!name) return;
     // Done
+    //
     const newState = {
-      id: newId,
+      id: name,
       name: name,
       x: menuPosition.x - 64 * 4, //that fixes the states spawning way off the right //this is fucked up and need fixing
       y: menuPosition.y,
       isSelected: true,
       isFinal: false,
     };
+
     const newArray = [...prev];
     newArray.push(newState);
-    setStates(newArray);
 
-    setClickedState(newId);
+    // we optimize it for exporting states and insertion sort
+    // we make a Map to make the lookup o(N)
+    const map = new Map(newArray.map((e: StateType) => [e.id, e]));
+    const orderedArray: StateType[] = names.map((e) => map.get(`q${e}`)!); // the ! is because there should always be a state here because we just created one and it should be on newState
+    // if no state was created there is a return above
+    setStates(orderedArray);
+    setClickedState(name);
   };
 
   // curva bezier entre los dos estados basada en las funciones de transicion
@@ -145,15 +148,15 @@ const Canvas = () => {
     {
       id: "curve0",
       name: "curve0",
-      start: "0",
-      end: "1",
+      start: "q0",
+      end: "q1",
       symbol: ["0", "1"],
     },
     {
       id: "curve1",
       name: "curve1",
-      start: "1",
-      end: "1",
+      start: "q1",
+      end: "q1",
       symbol: ["0"],
     },
   ]);
@@ -277,7 +280,9 @@ const Canvas = () => {
     },
     { id: "2", label: "Delete State.", method: deleteState },
   ];
-
+  useEffect(() => {
+    console.log(states);
+  }, [states]);
   // We're going to calculate the grid Once
   return (
     <div className="flex flex-row">
