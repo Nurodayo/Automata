@@ -87,51 +87,38 @@ const Canvas = () => {
       // we need to sort because the new state will always be appended to the end
       // ex names = [1, 2, 3] we see that 4 is missing and create q4
       // ex if a state was deleted names = [1, 2, 4] we find that 3 is missing and create q3
-      // quicksort from https://www.geeksforgeeks.org/dsa/iterative-quick-sort/
-      const partition = (arr: number[], low: number, high: number) => {
-        let temp: number;
-        const pivot = arr[high];
+      // Replaced quicksort with insertion sort because the array is always a nearly sorted list
 
-        let i = low - 1;
-        for (let j = low; j <= high - 1; j++) {
-          if (arr[j] <= pivot) {
-            i++;
+      const insertionSort = (arr: number[]) => {
+        const n = arr.length;
 
-            temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
+        for (let i = 1; i < n; i++) {
+          const current = arr[i];
+
+          let j = i - 1;
+          while (j > -1 && current < arr[j]) {
+            arr[j + 1] = arr[j];
+            j--;
           }
-        }
-        temp = arr[i + 1];
-        arr[i + 1] = arr[high];
-        arr[high] = temp;
 
-        return i + 1;
+          arr[j + 1] = current;
+        }
       };
 
-      function qSort(arr: number[], low: number, high: number) {
-        if (low < high) {
-          /* pi is partitioning index, 
-            arr[pi] is now at right place */
-          const pi = partition(arr, low, high);
-
-          // Recursively sort elements
-          // before partition and after
-          // partition
-          qSort(arr, low, pi - 1);
-          qSort(arr, pi + 1, high);
-        }
-      }
+      insertionSort(names);
+      // console.log(names);
 
       const length = names.length;
-      qSort(names, 0, length - 1);
 
       for (let i = 0; i <= length; i++) {
-        // console.log(i);
+        // console.log(`${i} names ${names[i]}`);
         if (i !== names[i]) {
+          // console.log(names[i]);
           return "q".concat(String(i));
         }
       }
+      console.error("Failed to create state");
+      return;
     })();
 
     if (!name) return;
@@ -139,7 +126,7 @@ const Canvas = () => {
     const newState = {
       id: newId,
       name: name,
-      x: menuPosition.x - 64 * 4, //that fixes the states spawning way off the right
+      x: menuPosition.x - 64 * 4, //that fixes the states spawning way off the right //this is fucked up and need fixing
       y: menuPosition.y,
       isSelected: true,
       isFinal: false,
