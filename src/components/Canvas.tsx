@@ -146,14 +146,14 @@ const Canvas = () => {
   // no sera la forma mas optimizada para hacer esto pero es muy parecido a la teoria
   const [curves, setCurves] = useState([
     {
-      id: "curve0",
+      id: "q0toq1",
       name: "curve0",
       start: "q0",
       end: "q1",
       symbol: ["0", "1"],
     },
     {
-      id: "curve1",
+      id: "q1toq1",
       name: "curve1",
       start: "q1",
       end: "q1",
@@ -209,17 +209,20 @@ const Canvas = () => {
   const createCurve = (end: string | null) => {
     if (!clickedState) return;
     if (!end) return;
-    const newId = crypto.randomUUID();
+    // const newId = crypto.randomUUID();
     // these calculations will make it easier to export a json with transition functions later
-    const startName = states.find((s) => s.id === clickedState) ?? "???";
-    const endName = states.find((s) => s.id === end) ?? "???";
+    const startName = states.find((s) => s.id === clickedState)?.name ?? "???"; // i was passing the object instead of the name before. big dumbass moment
+    const endName = states.find((s) => s.id === end)?.name ?? "???";
     const newCurve: CurveType = {
-      id: newId,
+      id: `${startName}to${endName}`,
       name: `${startName} to ${endName}`,
       start: clickedState,
       end: end,
       symbol: [],
     };
+
+    // Check duplicate transitions
+    if (curves.some((e) => e.id === newCurve.id)) return;
 
     const newCurves = [...curves, newCurve];
     setCurves(newCurves);
