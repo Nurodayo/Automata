@@ -2,7 +2,6 @@ import Select from "react-select";
 import type { StylesConfig } from "react-select";
 import useTheme from "../hooks/useTheme";
 import { useEffect, useState } from "react";
-import { FaEdit } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
@@ -36,8 +35,11 @@ type SideBarProps = {
   setClickedStateId: (id: string | null) => void;
   selectedCurve: CurveType | null;
   setSelectedCurve: (curve: CurveType | null) => void;
+  selectedSymbol: string | null;
+  setSelectedSymbol: (symbol: string | null) => void;
   selectState: (id: string) => void;
   createCurve: (end: string | null) => void;
+  addSymbol: (symbol: string | null) => void;
 };
 
 type Options = {
@@ -54,6 +56,8 @@ function SideBar({
   setClickedStateId,
   selectedCurve,
   setSelectedCurve,
+  selectedSymbol,
+  setSelectedSymbol,
   selectState,
   createCurve,
 }: SideBarProps) {
@@ -69,6 +73,7 @@ function SideBar({
   // we will open the menu, select a state using the select and execute the createCurve()
   const [stateMenu, setStateMenu] = useState(false);
   const [endState, setEndState] = useState<string | null>(null);
+  const [symbolMenu, setSymbolMenu] = useState(false);
 
   const selectedOption =
     sortedOptions.find((opt) => opt.value === clickedStateId) || null;
@@ -284,11 +289,11 @@ function SideBar({
             <div className="flex gap-1 w-full">
               <button
                 onClick={() => setStateMenu(true)}
-                className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer"
+                className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300"
               >
                 <FaPlus className="m-auto" />
               </button>
-              <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer">
+              <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300">
                 <FaMinus className="m-auto" />
               </button>
             </div>
@@ -304,10 +309,11 @@ function SideBar({
               selectedCurve.symbol.map((o) => (
                 <div
                   key={o}
-                  className="text-center p-2 text-center hover:bg-gray-100 dark:hover:bg-zinc-900 flex items-center justify-between gap-2"
+                  className={`text-center p-2 text-center hover:bg-gray-100 dark:hover:bg-zinc-900 flex items-center justify-between gap-2
+                    ${selectedSymbol === o ? "bg-gray-100 dark:bg-zinc-900 font-medium text-pink-500" : ""}`}
+                  onClick={() => setSelectedSymbol(o)}
                 >
-                  <p className="ml-auto">{o}</p>
-                  <FaEdit className="cursor-pointer ml-auto" />
+                  <p className="m-auto">{o}</p>
                 </div>
               ))
             ) : (
@@ -318,10 +324,10 @@ function SideBar({
         {/* Add symbols button */}
         <div className="p-1">
           <div className="flex gap-1 w-full">
-            <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer">
+            <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300">
               <FaPlus className="m-auto" />
             </button>
-            <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer">
+            <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300">
               <FaMinus className="m-auto" />
             </button>
           </div>

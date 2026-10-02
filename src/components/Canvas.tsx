@@ -182,11 +182,13 @@ const Canvas = () => {
   //
   const [clickedState, setClickedState] = useState<string | null>(null);
   const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   //
   //const stageRef = useRef(null); // does not seem to be necesary
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
   const selectState = (id: string) => {
+    setSelectedSymbol(null);
     setClickedState(id);
     setStates((prev) =>
       prev.map((state) => ({
@@ -226,6 +228,18 @@ const Canvas = () => {
 
     const newCurves = [...curves, newCurve];
     setCurves(newCurves);
+  };
+
+  // Transition Symbols
+
+  const addSymbol = (symbol: string | null) => {
+    if (!selectedCurve) return;
+    if (!symbol) return;
+
+    const updatedCurves = curves.map((e) =>
+      e.id === selectedCurve.id ? { ...e, symbol: [...e.symbol, symbol] } : e,
+    );
+    setCurves(updatedCurves);
   };
 
   const updatePosition = (id: string, x: number, y: number) => {
@@ -270,6 +284,7 @@ const Canvas = () => {
       y: pointer.y - mousePointTo.y * newScale,
     });
   };
+  // A la mierda que esta desordenada esta wea
   const menuOptions = [
     {
       id: "0",
@@ -296,6 +311,8 @@ const Canvas = () => {
         setClickedStateId={setClickedState}
         selectedCurve={selectedCurve}
         setSelectedCurve={setSelectedCurve}
+        selectedSymbol={selectedSymbol}
+        setSelectedSymbol={setSelectedSymbol}
         selectState={selectState}
         createCurve={createCurve}
       />

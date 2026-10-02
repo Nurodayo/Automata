@@ -17,8 +17,8 @@ function Landing() {
         dark:bg-[linear-gradient(to_right,#555_1px,transparent_1px),linear-gradient(to_bottom,#555_1px,transparent_1px)] bg-[size:50px_50px]
 "
       >
-        <h1 className="font-bold text-8xl">A Simple FDA Diagram tool.</h1>
-        <h2 className="font-semibold text-5xl">Built in React.</h2>
+        <h1 className="font-bold text-8xl">A Simple DFA Diagram tool.</h1>
+        <h2 className="font-semibold text-5xl">Hagan la tarea.</h2>
       </div>
       <div className="flex flex-row p-16">
         {theme ? (
