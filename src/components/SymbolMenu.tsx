@@ -48,7 +48,7 @@ function SymbolMenu({
           <h1>Add symbols separated by spaces</h1>
           <div className="flex flex-col padding-2 w-full h-full">
             <input
-              className="w-full border-black"
+              className="w-full border-black border-1"
               onChange={(e) => setInput(e.target.value)}
             ></input>
             {
