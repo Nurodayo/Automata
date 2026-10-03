@@ -9,14 +9,9 @@ import RightClickMenu from "./RightClickMenu";
 import SideBar from "./SideBar";
 import useTheme from "../hooks/useTheme";
 // i should make a ts file with the types
-
-type CurveType = {
-  id: string;
-  name: string;
-  start: string;
-  end: string;
-  symbol: string[];
-};
+// i did it
+import type { CurveType } from "../types";
+import type { StateType } from "../types";
 
 const Canvas = () => {
   const theme = useTheme((e) => e.bool);
@@ -70,85 +65,80 @@ const Canvas = () => {
   //   console.log(position);
   // }, [position]);
   const [states, setStates] = useState([
-    { id: "0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
-    { id: "1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
+    { id: "q0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
+    { id: "q1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
   ]);
 
   // Creating new states
   // i would like it so states are named automatically so i dont have to make a renaming ui
   const createStates = () => {
     clearSelection();
-    const prev = states;
-    const newId: string = crypto.randomUUID();
+    const prev: StateType[] = states;
+    // const newId: string = crypto.randomUUID();
+    const names = states.map((e) => Number(e.name.slice(1)));
 
     const name = (() => {
-      const names = states.map((e) => Number(e.name.slice(1)));
       // we will sort the array and then find the mising number to name the new state
       // we need to sort because the new state will always be appended to the end
       // ex names = [1, 2, 3] we see that 4 is missing and create q4
       // ex if a state was deleted names = [1, 2, 4] we find that 3 is missing and create q3
-      // quicksort from https://www.geeksforgeeks.org/dsa/iterative-quick-sort/
-      const partition = (arr: number[], low: number, high: number) => {
-        let temp: number;
-        const pivot = arr[high];
+      // Replaced quicksort with insertion sort because the array is always a nearly sorted list
 
-        let i = low - 1;
-        for (let j = low; j <= high - 1; j++) {
-          if (arr[j] <= pivot) {
-            i++;
+      const insertionSort = (arr: number[]) => {
+        const n = arr.length;
 
-            temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
+        for (let i = 1; i < n; i++) {
+          const current = arr[i];
+
+          let j = i - 1;
+          while (j > -1 && current < arr[j]) {
+            arr[j + 1] = arr[j];
+            j--;
           }
-        }
-        temp = arr[i + 1];
-        arr[i + 1] = arr[high];
-        arr[high] = temp;
 
-        return i + 1;
+          arr[j + 1] = current;
+        }
       };
 
-      function qSort(arr: number[], low: number, high: number) {
-        if (low < high) {
-          /* pi is partitioning index, 
-            arr[pi] is now at right place */
-          const pi = partition(arr, low, high);
-
-          // Recursively sort elements
-          // before partition and after
-          // partition
-          qSort(arr, low, pi - 1);
-          qSort(arr, pi + 1, high);
-        }
-      }
+      insertionSort(names);
+      // console.log(names);
 
       const length = names.length;
-      qSort(names, 0, length - 1);
 
       for (let i = 0; i <= length; i++) {
-        // console.log(i);
+        // console.log(`${i} names ${names[i]}`);
         if (i !== names[i]) {
+          // console.log(names[i]);
+          names.push(i);
           return "q".concat(String(i));
         }
       }
+      console.error("Failed to create state");
+      return;
     })();
 
     if (!name) return;
     // Done
+    //
     const newState = {
-      id: newId,
+      id: name,
       name: name,
-      x: menuPosition.x - 64 * 4, //that fixes the states spawning way off the right
+      x: menuPosition.x - 64 * 4, //that fixes the states spawning way off the right //this is fucked up and need fixing
       y: menuPosition.y,
       isSelected: true,
       isFinal: false,
     };
+
     const newArray = [...prev];
     newArray.push(newState);
-    setStates(newArray);
 
-    setClickedState(newId);
+    // we optimize it for exporting states and insertion sort
+    // we make a Map to make the lookup o(N)
+    const map = new Map(newArray.map((e: StateType) => [e.id, e]));
+    const orderedArray: StateType[] = names.map((e) => map.get(`q${e}`)!); // the ! is because there should always be a state here because we just created one and it should be on newState
+    // if no state was created there is a return above
+    setStates(orderedArray);
+    setClickedState(name);
   };
 
   // curva bezier entre los dos estados basada en las funciones de transicion
@@ -156,17 +146,17 @@ const Canvas = () => {
   // no sera la forma mas optimizada para hacer esto pero es muy parecido a la teoria
   const [curves, setCurves] = useState([
     {
-      id: "curve0",
+      id: "q0toq1",
       name: "curve0",
-      start: "0",
-      end: "1",
+      start: "q0",
+      end: "q1",
       symbol: ["0", "1"],
     },
     {
-      id: "curve1",
+      id: "q1toq1",
       name: "curve1",
-      start: "1",
-      end: "1",
+      start: "q1",
+      end: "q1",
       symbol: ["0"],
     },
   ]);
@@ -192,11 +182,13 @@ const Canvas = () => {
   //
   const [clickedState, setClickedState] = useState<string | null>(null);
   const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
+  const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
   //
   //const stageRef = useRef(null); // does not seem to be necesary
   //function to select and deselect states
   //we create a new array to select the current clicked state and deselect the other ones
   const selectState = (id: string) => {
+    setSelectedSymbol(null);
     setClickedState(id);
     setStates((prev) =>
       prev.map((state) => ({
@@ -219,20 +211,38 @@ const Canvas = () => {
   const createCurve = (end: string | null) => {
     if (!clickedState) return;
     if (!end) return;
-    const newId = crypto.randomUUID();
+    // const newId = crypto.randomUUID();
     // these calculations will make it easier to export a json with transition functions later
-    const startName = states.find((s) => s.id === clickedState) ?? "???";
-    const endName = states.find((s) => s.id === end) ?? "???";
+    const startName = states.find((s) => s.id === clickedState)?.name ?? "???"; // i was passing the object instead of the name before. big dumbass moment
+    const endName = states.find((s) => s.id === end)?.name ?? "???";
     const newCurve: CurveType = {
-      id: newId,
+      id: `${startName}to${endName}`,
       name: `${startName} to ${endName}`,
       start: clickedState,
       end: end,
       symbol: [],
     };
 
+    // Check duplicate transitions
+    if (curves.some((e) => e.id === newCurve.id)) return;
+
     const newCurves = [...curves, newCurve];
     setCurves(newCurves);
+  };
+
+  // Transition Symbols
+
+  // we replace the array with the modified one
+  const addSymbol = (symbol: string[] | null) => {
+    if (!selectedCurve) return;
+    if (!symbol) return;
+
+    const updatedCurves = curves.map((e) =>
+      e.id === selectedCurve.id ? { ...e, symbol: symbol } : e,
+    );
+    setCurves(updatedCurves);
+
+    setSelectedCurve((prev) => (prev ? { ...prev, symbol } : prev));
   };
 
   const updatePosition = (id: string, x: number, y: number) => {
@@ -277,6 +287,7 @@ const Canvas = () => {
       y: pointer.y - mousePointTo.y * newScale,
     });
   };
+  // A la mierda que esta desordenada esta wea
   const menuOptions = [
     {
       id: "0",
@@ -290,7 +301,9 @@ const Canvas = () => {
     },
     { id: "2", label: "Delete State.", method: deleteState },
   ];
-
+  useEffect(() => {
+    console.log(states);
+  }, [states]);
   // We're going to calculate the grid Once
   return (
     <div className="flex flex-row">
@@ -301,8 +314,11 @@ const Canvas = () => {
         setClickedStateId={setClickedState}
         selectedCurve={selectedCurve}
         setSelectedCurve={setSelectedCurve}
+        selectedSymbol={selectedSymbol}
+        setSelectedSymbol={setSelectedSymbol}
         selectState={selectState}
         createCurve={createCurve}
+        addSymbol={addSymbol}
       />
       {/* height / 16 is to account for the navbar*/}
       <Stage
