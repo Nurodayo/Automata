@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
+
+import SymbolMenu from "./SymbolMenu";
 //Este sidebar te permitira conectar estados, seleccionar simbolos de transicion
 //Hacer que los estados sean terminales entre otras cosas
 
@@ -39,7 +41,7 @@ type SideBarProps = {
   setSelectedSymbol: (symbol: string | null) => void;
   selectState: (id: string) => void;
   createCurve: (end: string | null) => void;
-  addSymbol: (symbol: string | null) => void;
+  addSymbol: (symbol: string[] | null) => void;
 };
 
 type Options = {
@@ -60,6 +62,7 @@ function SideBar({
   setSelectedSymbol,
   selectState,
   createCurve,
+  addSymbol,
 }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
@@ -148,9 +151,6 @@ function SideBar({
   };
 
   const filteredCurves = filterCurves();
-  //just realized i need another useState to select an specific filtered curves
-  // const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
-  // complains about infinite rerenders but it works fine
   useEffect(() => {
     setSelectedCurve(null);
   }, [clickedStateId]);
@@ -214,6 +214,16 @@ function SideBar({
           />
         </div>
       )}
+      {/*I need to put this thing above into it's own component*/}
+      {selectedCurve && symbolMenu && (
+        <SymbolMenu
+          array={selectedCurve.symbol}
+          symbolMenu={symbolMenu}
+          setSymbolMenu={setSymbolMenu}
+          addSymbol={addSymbol}
+        />
+      )}
+
       <div className="w-full mr-auto ml-auto p-2 border-b border-black/50 dark:border-white/50">
         <div className="flex gap-1 w-full">
           <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50">
@@ -324,7 +334,15 @@ function SideBar({
         {/* Add symbols button */}
         <div className="p-1">
           <div className="flex gap-1 w-full">
-            <button className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300">
+            <button
+              onClick={() => {
+                // fixes a small bug
+                if (selectedCurve) {
+                  setSymbolMenu(true);
+                }
+              }}
+              className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300"
+            >
               <FaPlus className="m-auto" />
             </button>
             <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300">

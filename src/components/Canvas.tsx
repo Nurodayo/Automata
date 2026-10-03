@@ -232,14 +232,17 @@ const Canvas = () => {
 
   // Transition Symbols
 
-  const addSymbol = (symbol: string | null) => {
+  // we replace the array with the modified one
+  const addSymbol = (symbol: string[] | null) => {
     if (!selectedCurve) return;
     if (!symbol) return;
 
     const updatedCurves = curves.map((e) =>
-      e.id === selectedCurve.id ? { ...e, symbol: [...e.symbol, symbol] } : e,
+      e.id === selectedCurve.id ? { ...e, symbol: symbol } : e,
     );
     setCurves(updatedCurves);
+
+    setSelectedCurve((prev) => (prev ? { ...prev, symbol } : prev));
   };
 
   const updatePosition = (id: string, x: number, y: number) => {
@@ -315,6 +318,7 @@ const Canvas = () => {
         setSelectedSymbol={setSelectedSymbol}
         selectState={selectState}
         createCurve={createCurve}
+        addSymbol={addSymbol}
       />
       {/* height / 16 is to account for the navbar*/}
       <Stage
