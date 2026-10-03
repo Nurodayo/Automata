@@ -42,8 +42,12 @@ type SideBarProps = {
   selectState: (id: string) => void;
   createCurve: (end: string | null) => void;
   addSymbol: (symbol: string[] | null) => void;
+  setStart: (state: string) => void;
+  start: string;
+  setTerminal: () => void;
 };
-
+// dont know if i should make it null since state creation makes it so there would always
+// be an state with that id eventually so for now i will set the default to q0
 type Options = {
   value: string;
   label: string;
@@ -63,6 +67,9 @@ function SideBar({
   selectState,
   createCurve,
   addSymbol,
+  setStart,
+  start,
+  setTerminal,
 }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
@@ -78,8 +85,21 @@ function SideBar({
   const [endState, setEndState] = useState<string | null>(null);
   const [symbolMenu, setSymbolMenu] = useState(false);
 
+  const isTerminal = () => {
+    if (!clickedStateId) return;
+    const state = states.find((s) => s.id === clickedStateId);
+
+    if (state?.isFinal) {
+      return "True";
+    } else {
+      return "False";
+    }
+  };
+
   const selectedOption =
     sortedOptions.find((opt) => opt.value === clickedStateId) || null;
+  const selectedStart =
+    sortedOptions.find((opt) => opt.value === start) || null;
 
   //find curves that start on the state that the user has selected using the ui
   const filterCurves = () => {
@@ -252,12 +272,35 @@ function SideBar({
             maxMenuHeight={300}
           />
         </div>
+        <div className="flex gap-1 w-full pt-2">
+          <p className="flex-1 truncate text-xl text-center rounded-full font-medium py-1">
+            Starting State.
+          </p>
+          {/* Select start */}
+          <Select
+            value={selectedStart}
+            onChange={(e) => {
+              setStart(e?.value ?? "q0");
+            }}
+            options={sortedOptions}
+            styles={selectStyle(theme)}
+            menuPlacement="auto"
+            maxMenuHeight={300}
+          />
+        </div>
+
         <div className="flex gap-1 w-full py-2">
           <p className="flex-1 truncate text-xl text-center rounded-full font-medium py-1">
             Accepting State.
           </p>
-          <button className="w-[5vw] font-[JetBrains_Mono] truncate text-xl border border-black/50 rounded-full py-1 dark:border-white/50">
-            True
+          <button
+            onClick={setTerminal}
+            className="w-[5vw] font-[JetBrains_Mono] truncate text-xl border border-black/50
+            rounded-full py-1 dark:border-white/50
+            duration-300 hover:scale-105 hover:text-pink-500 hover:border-pink-500 dark:hover:bg-zinc-900
+            hover:bg-gray-100"
+          >
+            {isTerminal()}
           </button>
         </div>
         {/* Transitions */}
@@ -299,11 +342,17 @@ function SideBar({
             <div className="flex gap-1 w-full">
               <button
                 onClick={() => setStateMenu(true)}
-                className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300"
+                className="flex-1 truncate items-center justify-center text-lg border border-black/50
+                rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 hover:border-pink-500
+                hover:text-pink-500 hover:bg-gray-100 dark:hover:bg-zinc-900 duration-300"
               >
                 <FaPlus className="m-auto" />
               </button>
-              <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300">
+              <button
+                className="flex-1 truncate items-center justify-center text-lg border border-black/50
+                rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 hover:border-pink-500
+                hover:text-pink-500 hover:bg-gray-100 dark:hover:bg-zinc-900 duration-300"
+              >
                 <FaMinus className="m-auto" />
               </button>
             </div>
@@ -341,11 +390,17 @@ function SideBar({
                   setSymbolMenu(true);
                 }
               }}
-              className="flex-1 truncate items-center justify-center text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300"
+              className="flex-1 truncate items-center justify-center text-lg border border-black/50
+                rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 hover:border-pink-500
+                hover:text-pink-500 hober:bg-gray-100 dark:hover:bg-zinc-900 duration-300"
             >
               <FaPlus className="m-auto" />
             </button>
-            <button className="flex-1 truncate text-lg border border-black/50 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 duration-300">
+            <button
+              className="flex-1 truncate items-center justify-center text-lg border border-black/50
+                rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 hover:border-pink-500
+                hover:text-pink-500 hover:bg-gray-100 dark:hover:bg-zinc-900 duration-300"
+            >
               <FaMinus className="m-auto" />
             </button>
           </div>
