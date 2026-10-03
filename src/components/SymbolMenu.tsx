@@ -24,12 +24,9 @@ function SymbolMenu({
   const [input, setInput] = useState("");
 
   const updateArray = (e: string) => {
-    const newArray = [...array];
-    for (let i = 0; i < e.length; i++) {
-      if (e[i] !== " ") {
-        newArray.push(e[i]);
-      }
-    }
+    const temp = e.split(" ");
+    const newArray = [...array].concat(temp);
+
     addSymbol(newArray);
   };
 
