@@ -45,6 +45,8 @@ type SideBarProps = {
   setStart: (state: string) => void;
   start: string;
   setTerminal: () => void;
+  deleteCurve: () => void;
+  deleteSymbol: (symbol: string | null) => void;
 };
 // dont know if i should make it null since state creation makes it so there would always
 // be an state with that id eventually so for now i will set the default to q0
@@ -70,6 +72,8 @@ function SideBar({
   setStart,
   start,
   setTerminal,
+  deleteCurve,
+  deleteSymbol,
 }: SideBarProps) {
   const theme = useTheme((e) => e.bool);
   const stateOptions = states.map((e) => ({ value: e.id, label: e.name }));
@@ -349,6 +353,7 @@ function SideBar({
                 <FaPlus className="m-auto" />
               </button>
               <button
+                onClick={() => deleteCurve()}
                 className="flex-1 truncate items-center justify-center text-lg border border-black/50
                 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 hover:border-pink-500
                 hover:text-pink-500 hover:bg-gray-100 dark:hover:bg-zinc-900 duration-300"
@@ -397,6 +402,7 @@ function SideBar({
               <FaPlus className="m-auto" />
             </button>
             <button
+              onClick={() => deleteSymbol(selectedSymbol)}
               className="flex-1 truncate items-center justify-center text-lg border border-black/50
                 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 hover:border-pink-500
                 hover:text-pink-500 hover:bg-gray-100 dark:hover:bg-zinc-900 duration-300"

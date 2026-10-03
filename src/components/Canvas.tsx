@@ -180,6 +180,14 @@ const Canvas = () => {
     setStates(filteredStates);
   };
 
+  const deleteCurve = () => {
+    //delete curves
+    const filteredCurves: CurveType[] = curves.filter(
+      (c) => c !== selectedCurve,
+    );
+    setCurves(filteredCurves);
+  };
+
   // Last id of the last clicked state
   //
   // SideBar Props
@@ -279,6 +287,20 @@ const Canvas = () => {
     setSelectedCurve((prev) => (prev ? { ...prev, symbol } : prev));
   };
 
+  const deleteSymbol = (symbol: string | null) => {
+    if (!selectedCurve) return;
+    if (!symbol) return;
+
+    const array = selectedCurve.symbol.filter((s) => s !== symbol);
+
+    const updatedCurves = curves.map((e) =>
+      e.id === selectedCurve.id ? { ...e, symbol: array } : e,
+    );
+    setCurves(updatedCurves);
+
+    setSelectedCurve((prev) => (prev ? { ...prev, symbol: array } : prev));
+  };
+
   const updatePosition = (id: string, x: number, y: number) => {
     setStates((prev) =>
       prev.map((state) => (state.id === id ? { ...state, x, y } : state)),
@@ -356,6 +378,8 @@ const Canvas = () => {
         setStart={setStart}
         start={start}
         setTerminal={setTerminal}
+        deleteCurve={deleteCurve}
+        deleteSymbol={deleteSymbol}
       />
       {/* height / 16 is to account for the navbar*/}
       <Stage

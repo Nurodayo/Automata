@@ -25,7 +25,8 @@ function SymbolMenu({
 
   const updateArray = (e: string) => {
     const temp = e.split(" ");
-    const newArray = [...array].concat(temp);
+    const concatArray = temp.filter((a) => !array.includes(a));
+    const newArray = [...array].concat(concatArray).sort();
 
     addSymbol(newArray);
   };
@@ -64,6 +65,12 @@ function SymbolMenu({
           </div>
         </div>
       </div>
+      <div
+        onClick={() => {
+          setSymbolMenu(false);
+        }}
+        className="flex items-center justify-center z-20 w-[100vw] h-[94vh] absolute"
+      />
     </div>
   );
 }
