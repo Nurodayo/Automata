@@ -1,4 +1,4 @@
-import { Stage, Layer } from "react-konva";
+import { Stage, Layer, Group } from "react-konva";
 import { useState, useEffect, useRef } from "react";
 import State from "./State";
 import Curve from "./Curve";
@@ -122,13 +122,17 @@ const Canvas = () => {
     })();
 
     if (!name) return;
-    // Done
-    //
+    if (!stageRef.current) return;
+    const group = stageRef.current.findOne("Group");
+    if (!group) return;
+    const pos = group.getRelativePointerPosition();
+    if (!pos) return;
+
     const newState = {
       id: name,
       name: name,
-      x: menuPosition.x - 64 * 4, //that fixes the states spawning way off the right //this is fucked up and need fixing
-      y: menuPosition.y,
+      x: pos.x, //that fixes the states spawning way off the right //this is fucked up and need fixing
+      y: pos.y,
       isSelected: true,
       isFinal: false,
     };
@@ -430,22 +434,24 @@ const Canvas = () => {
           })}
         </Layer>
         <Layer>
-          {/* iterating states */}
-          {states.map((state) => (
-            <State
-              key={state.id}
-              id={state.id}
-              name={state.name}
-              x={state.x}
-              y={state.y}
-              isSelected={state.isSelected}
-              isFinal={state.isFinal}
-              onClick={selectState}
-              onDragStart={() => selectState(state.id)}
-              onDragoMove={updatePosition}
-              onDragEnd={updatePosition}
-            />
-          ))}
+          <Group>
+            {/* iterating states */}
+            {states.map((state) => (
+              <State
+                key={state.id}
+                id={state.id}
+                name={state.name}
+                x={state.x}
+                y={state.y}
+                isSelected={state.isSelected}
+                isFinal={state.isFinal}
+                onClick={selectState}
+                onDragStart={() => selectState(state.id)}
+                onDragoMove={updatePosition}
+                onDragEnd={updatePosition}
+              />
+            ))}
+          </Group>
         </Layer>
       </Stage>
       {showMenu && (
