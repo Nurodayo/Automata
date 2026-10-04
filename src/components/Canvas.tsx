@@ -186,6 +186,7 @@ const Canvas = () => {
       (c) => c !== selectedCurve,
     );
     setCurves(filteredCurves);
+    setSelectedCurve(null);
   };
 
   // Last id of the last clicked state
