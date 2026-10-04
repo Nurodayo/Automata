@@ -402,7 +402,9 @@ function SideBar({
               <FaPlus className="m-auto" />
             </button>
             <button
-              onClick={() => deleteSymbol(selectedSymbol)}
+              onClick={() => {
+                deleteSymbol(selectedSymbol);
+              }}
               className="flex-1 truncate items-center justify-center text-lg border border-black/50
                 rounded-md py-1 dark:border-white/50 cursor-pointer hover:scale-103 hover:border-pink-500
                 hover:text-pink-500 hover:bg-gray-100 dark:hover:bg-zinc-900 duration-300"

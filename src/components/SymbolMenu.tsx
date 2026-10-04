@@ -46,8 +46,8 @@ function SymbolMenu({
           <h1 className="text-lg">Add symbols separated by spaces</h1>
           <div className="flex flex-col padding-2 w-full h-full justify-center items-center">
             <input
-              className="w-full border-black border-1 p-1 rounded-md border-black
-              dark:border-white/50 w-lg focus:border-pink-500 outline-none focus:outline-none"
+              className="w-7/8 border-black border-1 p-1 rounded-md border-black
+              dark:border-white/50 focus:border-pink-500 outline-none focus:outline-none"
               onChange={(e) => setInput(e.target.value)}
             ></input>
             {

@@ -1,4 +1,4 @@
-import { Stage, Layer } from "react-konva";
+import { Stage, Layer, Group } from "react-konva";
 import { useState, useEffect, useRef } from "react";
 import State from "./State";
 import Curve from "./Curve";
@@ -64,14 +64,16 @@ const Canvas = () => {
   // useEffect(() => {
   //   console.log(position);
   // }, [position]);
-  const [states, setStates] = useState([
-    { id: "q0", name: "q0", x: 80, y: 80, isSelected: false, isFinal: false },
-    { id: "q1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
-  ]);
 
-  //defining starting state
+  const [states, setStates] = useState<StateType[]>(() => {
+    const saved = localStorage.getItem("states");
+    return saved ? JSON.parse(saved) : [];
+  });
+
   //we hold the id of the state we want to be the starting position
-  const [start, setStart] = useState("q0");
+  const [start, setStart] = useState(() => {
+    return localStorage.getItem("start") || "q0";
+  });
 
   // Creating new states
   // i would like it so states are named automatically so i dont have to make a renaming ui
@@ -122,13 +124,17 @@ const Canvas = () => {
     })();
 
     if (!name) return;
-    // Done
-    //
+    if (!stageRef.current) return;
+    const group = stageRef.current.findOne("Group");
+    if (!group) return;
+    const pos = group.getRelativePointerPosition();
+    if (!pos) return;
+
     const newState = {
       id: name,
       name: name,
-      x: menuPosition.x - 64 * 4, //that fixes the states spawning way off the right //this is fucked up and need fixing
-      y: menuPosition.y,
+      x: pos.x, //that fixes the states spawning way off the right //this is fucked up and need fixing
+      y: pos.y,
       isSelected: true,
       isFinal: false,
     };
@@ -148,23 +154,10 @@ const Canvas = () => {
   // curva bezier entre los dos estados basada en las funciones de transicion
   // bezier curve between both states bases on transition functions (or however the hell they're called in english)
   // no sera la forma mas optimizada para hacer esto pero es muy parecido a la teoria
-  const [curves, setCurves] = useState([
-    {
-      id: "q0toq1",
-      name: "curve0",
-      start: "q0",
-      end: "q1",
-      symbol: ["0", "1"],
-    },
-    {
-      id: "q1toq1",
-      name: "curve1",
-      start: "q1",
-      end: "q1",
-      symbol: ["0"],
-    },
-  ]);
-
+  const [curves, setCurves] = useState<CurveType[]>(() => {
+    const saved = localStorage.getItem("curves");
+    return saved ? JSON.parse(saved) : [];
+  });
   // When we delete a state we also need to delete al transitions containing that state
   const deleteState = () => {
     //delete curves
@@ -196,6 +189,10 @@ const Canvas = () => {
   const [clickedState, setClickedState] = useState<string | null>(null);
   const [selectedCurve, setSelectedCurve] = useState<CurveType | null>(null);
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
+
+  useEffect(() => {
+    clearSelection();
+  }, []);
   //
   //const stageRef = useRef(null); // does not seem to be necesary
   //function to select and deselect states
@@ -358,9 +355,18 @@ const Canvas = () => {
     },
     { id: "2", label: "Delete State.", method: deleteState },
   ];
+
   useEffect(() => {
-    console.log(states);
+    localStorage.setItem("curves", JSON.stringify(curves));
+  }, [curves]);
+
+  useEffect(() => {
+    localStorage.setItem("states", JSON.stringify(states));
   }, [states]);
+
+  useEffect(() => {
+    localStorage.setItem("start", start);
+  });
   // We're going to calculate the grid Once
   return (
     <div className="flex flex-row">
@@ -430,22 +436,24 @@ const Canvas = () => {
           })}
         </Layer>
         <Layer>
-          {/* iterating states */}
-          {states.map((state) => (
-            <State
-              key={state.id}
-              id={state.id}
-              name={state.name}
-              x={state.x}
-              y={state.y}
-              isSelected={state.isSelected}
-              isFinal={state.isFinal}
-              onClick={selectState}
-              onDragStart={() => selectState(state.id)}
-              onDragoMove={updatePosition}
-              onDragEnd={updatePosition}
-            />
-          ))}
+          <Group>
+            {/* iterating states */}
+            {states.map((state) => (
+              <State
+                key={state.id}
+                id={state.id}
+                name={state.name}
+                x={state.x}
+                y={state.y}
+                isSelected={state.isSelected}
+                isFinal={state.isFinal}
+                onClick={selectState}
+                onDragStart={() => selectState(state.id)}
+                onDragoMove={updatePosition}
+                onDragEnd={updatePosition}
+              />
+            ))}
+          </Group>
         </Layer>
       </Stage>
       {showMenu && (
