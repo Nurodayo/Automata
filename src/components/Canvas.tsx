@@ -69,6 +69,10 @@ const Canvas = () => {
     { id: "q1", name: "q1", x: 180, y: 180, isSelected: false, isFinal: true },
   ]);
 
+  //defining starting state
+  //we hold the id of the state we want to be the starting position
+  const [start, setStart] = useState("q0");
+
   // Creating new states
   // i would like it so states are named automatically so i dont have to make a renaming ui
   const createStates = () => {
@@ -176,6 +180,15 @@ const Canvas = () => {
     setStates(filteredStates);
   };
 
+  const deleteCurve = () => {
+    //delete curves
+    const filteredCurves: CurveType[] = curves.filter(
+      (c) => c !== selectedCurve,
+    );
+    setCurves(filteredCurves);
+    setSelectedCurve(null);
+  };
+
   // Last id of the last clicked state
   //
   // SideBar Props
@@ -206,6 +219,22 @@ const Canvas = () => {
       })),
     );
   };
+  // Starting curve
+  const renderStart = (start: string) => {
+    const state = states.find((s) => s.id === start);
+    if (!state) return;
+    const from = state.x - 160;
+
+    return (
+      <Curve
+        start={[from, state.y]}
+        end={[state.x, state.y]}
+        symbol={[]}
+        radius={radius}
+      />
+    );
+  };
+
   // Creating new curves
   // We will use the start as the current selected state
   const createCurve = (end: string | null) => {
@@ -230,6 +259,20 @@ const Canvas = () => {
     setCurves(newCurves);
   };
 
+  const setTerminal = () => {
+    if (!clickedState) return;
+
+    const state = states.find((s) => s.id === clickedState);
+    if (!state) return;
+    const updatedFinal = !state.isFinal;
+
+    setStates((prev) =>
+      prev.map((state) =>
+        state.id === clickedState ? { ...state, isFinal: updatedFinal } : state,
+      ),
+    );
+  };
+
   // Transition Symbols
 
   // we replace the array with the modified one
@@ -243,6 +286,20 @@ const Canvas = () => {
     setCurves(updatedCurves);
 
     setSelectedCurve((prev) => (prev ? { ...prev, symbol } : prev));
+  };
+
+  const deleteSymbol = (symbol: string | null) => {
+    if (!selectedCurve) return;
+    if (!symbol) return;
+
+    const array = selectedCurve.symbol.filter((s) => s !== symbol);
+
+    const updatedCurves = curves.map((e) =>
+      e.id === selectedCurve.id ? { ...e, symbol: array } : e,
+    );
+    setCurves(updatedCurves);
+
+    setSelectedCurve((prev) => (prev ? { ...prev, symbol: array } : prev));
   };
 
   const updatePosition = (id: string, x: number, y: number) => {
@@ -319,6 +376,11 @@ const Canvas = () => {
         selectState={selectState}
         createCurve={createCurve}
         addSymbol={addSymbol}
+        setStart={setStart}
+        start={start}
+        setTerminal={setTerminal}
+        deleteCurve={deleteCurve}
+        deleteSymbol={deleteSymbol}
       />
       {/* height / 16 is to account for the navbar*/}
       <Stage
@@ -346,6 +408,9 @@ const Canvas = () => {
           />
         </Layer>
         <Layer>
+          {/*Starting curve*/}
+          {renderStart(start)}
+
           {/* iterating curves*/}
           {curves.map((curve) => {
             const from = states.find((s) => s.id === curve.start);

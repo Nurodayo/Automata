@@ -63,7 +63,7 @@ function Curve({ start, end, symbol, radius }: CurveProps) {
   let startEdge: number[];
   let endEdge: number[];
   // estaba checkeando si la distancia era 0 antes pero esto es mas facil
-  if (start[0] !== end[0] && start[1] !== end[1]) {
+  if (start[0] !== end[0]) {
     startEdge = [start[0] + radius * unitV1[0], start[1] + radius * unitV1[1]];
 
     endEdge = [end[0] - radius * unitV2[0], end[1] - radius * unitV2[1]];
