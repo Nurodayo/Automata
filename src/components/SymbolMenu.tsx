@@ -55,6 +55,7 @@ function SymbolMenu({
                 className="mt-auto ml-auto pr-4"
                 onClick={() => {
                   updateArray(input);
+                  setSymbolMenu(false);
                 }}
               >
                 <MdNavigateNext
