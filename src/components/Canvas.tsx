@@ -413,7 +413,8 @@ const Canvas = () => {
       <button
         onClick={handleExport}
         className="flex items-center justify-center z-20 absolute bottom-0 right-0 p-3 bg-white border-black
-        border-1 rounded-full mr-2 mb-2 hover:text-pink-500 hover:scale-110 hover:border-pink-500 duration-300"
+        border-1 rounded-full mr-2 mb-2 hover:text-pink-500 hover:scale-110 hover:border-pink-500 duration-300 
+        dark:text-white dark:border-white/50 dark:bg-black"
       >
         <FaSave size={48} />
       </button>
