@@ -186,7 +186,10 @@ function SideBar({
       instead of transitionMenu*/}
       {stateMenu && (
         <div className="flex items-center justify-center z-20 w-[100vw] h-[94vh] bg-black/50 absolute backdrop-blur-xs">
-          <div className="w-[33vw] h-[33vh] bg-white rounded-md border-1 border-black dark:bg-black dark:border-white/50 z-30">
+          <div
+            className="w-[33vw] h-[33vh] bg-white rounded-md border-1 border-black dark:bg-black
+            dark:border-white/50 z-30"
+          >
             <div className="flex w-[33vw] flex-col items-center p-2 h-full">
               <button
                 className="ml-auto px-2 hover:scale-120 hover:text-pink-500 duration-300 cursor-pointer"

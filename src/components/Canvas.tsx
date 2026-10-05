@@ -8,10 +8,13 @@ import Konva from "konva";
 import RightClickMenu from "./RightClickMenu";
 import SideBar from "./SideBar";
 import useTheme from "../hooks/useTheme";
+import { jsPDF } from "jspdf";
 // i should make a ts file with the types
 // i did it
 import type { CurveType } from "../types";
 import type { StateType } from "../types";
+
+import { FaSave } from "react-icons/fa";
 
 const Canvas = () => {
   const theme = useTheme((e) => e.bool);
@@ -341,6 +344,43 @@ const Canvas = () => {
       y: pointer.y - mousePointTo.y * newScale,
     });
   };
+
+  const handleExport = () => {
+    clearSelection();
+
+    if (!stageRef.current) return;
+
+    const stage = stageRef.current;
+
+    const grid = stage.findOne(".grid");
+    if (!grid) return;
+
+    grid.hide();
+
+    const rect = stage.getClientRect({
+      skipTransform: false,
+    });
+
+    const pdf = new jsPDF({
+      orientation: "landscape",
+      unit: "px",
+      format: [rect.width, rect.height],
+      hotfixes: ["px_scaling"],
+    });
+
+    pdf.addImage(
+      stage.toDataURL({ pixelRatio: 6 }), // 6x pixel size because i am lazy
+      0,
+      0,
+      rect.width,
+      rect.height,
+    );
+
+    grid.show();
+
+    pdf.save("automata.pdf");
+  };
+
   // A la mierda que esta desordenada esta wea
   const menuOptions = [
     {
@@ -370,6 +410,13 @@ const Canvas = () => {
   // We're going to calculate the grid Once
   return (
     <div className="flex flex-row">
+      <button
+        onClick={handleExport}
+        className="flex items-center justify-center z-20 absolute bottom-0 right-0 p-3 bg-white border-black
+        border-1 rounded-full mr-2 mb-2 hover:text-pink-500 hover:scale-110 hover:border-pink-500 duration-300"
+      >
+        <FaSave size={48} />
+      </button>
       <SideBar
         states={states}
         curves={curves}
@@ -388,6 +435,7 @@ const Canvas = () => {
         deleteCurve={deleteCurve}
         deleteSymbol={deleteSymbol}
       />
+
       {/* height / 16 is to account for the navbar*/}
       <Stage
         ref={stageRef}
@@ -405,7 +453,7 @@ const Canvas = () => {
           backgroundColor: theme ? "white" : "black",
         }}
       >
-        <Layer>
+        <Layer name="grid">
           <Grid
             width={range}
             height={range}
